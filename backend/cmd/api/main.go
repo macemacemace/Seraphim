@@ -44,7 +44,9 @@ func main() {
 
 	router := gin.Default()
 
-	router.GET("/health", func(c *gin.Context) {
+	api := router.Group("/api")
+
+	api.GET("/health", func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
 		defer cancel()
 
