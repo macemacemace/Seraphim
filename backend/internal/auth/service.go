@@ -3,9 +3,9 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/mail"
 	"strings"
-	"fmt"
 
 	"github.com/macemacemace/seraphim/backend/internal/db"
 	"golang.org/x/crypto/bcrypt"
@@ -30,27 +30,36 @@ func (s *Service) Register(ctx context.Context, email, password, name string) (d
 	email = strings.TrimSpace(email)
 	email = strings.ToLower(email)
 
-	if _, err := mail.ParseAddress(email); err != nil{
+	if _, err := mail.ParseAddress(email); err != nil {
 		return db.User{}, ErrInvalidEmail
 	}
-	if len(password) < 8 || len(password) > 72 {	
+	if len(password) < 8 || len(password) > 72 {
 		return db.User{}, ErrWeakPassword
-		
+
 	}
 	name = strings.TrimSpace(name)
 
-	if name == ""{
+	if name == "" {
 		return db.User{}, ErrNameRequired
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(password),
-bcrypt.DefaultCost)
+		bcrypt.DefaultCost)
 
-	if  (err != nil){
+	if err != nil {
 		return db.User{}, fmt.Errorf("hash password: %w", err)
 	}
 
-	return db.User{}, nil
+	user, err := s.store.CreateUser(ctx, db.CreateUserParams{
+		Email:        email,
+		PasswordHash: string(hash),
+		Name:         name,
+	})
+	if err != nil {
+		return db.User{}, fmt.Errorf("create user: %w", err)
+	}
+
+	return user, nil
 
 }
 
