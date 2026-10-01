@@ -4,9 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	
 	"net/mail"
 	"strings"
 
+	
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/macemacemace/seraphim/backend/internal/db"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -56,12 +59,20 @@ func (s *Service) Register(ctx context.Context, email, password, name string) (d
 		Name:         name,
 	})
 	if err != nil {
+
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505"{
+			return db.User{}, ErrEmailTaken
+		}
 		return db.User{}, fmt.Errorf("create user: %w", err)
 	}
 
 	return user, nil
 
 }
+
+
+
 
 type Service struct {
 	store userStore
