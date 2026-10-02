@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"errors"
 )
 
 type registerRequest struct {
@@ -36,18 +37,21 @@ func (h *Handler) Register(c *gin.Context) {
 	}
 
 	user, err := h.service.Register(c.Request.Context(), req.Email, req.Password, req.Name)
-	_ = user
-	_ = err
-	if err == ErrInvalidEmail || err == ErrWeakPassword || err == ErrNameRequired {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+	if err != nil {
+		if errors.Is(err, ErrInvalidEmail) || errors.Is(err, ErrWeakPassword) || errors.Is(err, ErrNameRequired) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if errors.Is(err, ErrEmailTaken) {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+
+			return
+		}
+		log.Printf("register: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong"})
 		return
-	}
-	if err == ErrEmailTaken {
-		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
-		return
+
 	}
 
-	log.Printf("register: %v", err)
-	c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong"})
-	return
 }
