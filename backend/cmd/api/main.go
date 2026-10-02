@@ -10,6 +10,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
+	"github.com/macemacemace/seraphim/backend/internal/auth"
+
+	"github.com/macemacemace/seraphim/backend/internal/db"
 )
 
 func main() {
@@ -45,6 +48,14 @@ func main() {
 	router := gin.Default()
 
 	api := router.Group("/api")
+
+	queries := db.New(pool)
+
+	authService := auth.NewService(queries)
+
+	authHandler := auth.NewHandler(authService)
+
+	api.POST("/auth/register", authHandler.Register)
 
 	api.GET("/health", func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)

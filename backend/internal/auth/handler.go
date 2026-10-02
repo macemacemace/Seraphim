@@ -1,12 +1,12 @@
 package auth
 
 import (
+	"errors"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"errors"
 )
 
 type registerRequest struct {
@@ -53,5 +53,6 @@ func (h *Handler) Register(c *gin.Context) {
 		return
 
 	}
+	c.JSON(http.StatusCreated, registerResponse{ID: user.ID, Email: user.Email, Name: user.Name})
 
 }
