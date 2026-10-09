@@ -14,14 +14,16 @@ import (
 )
 
 var (
-	ErrInvalidEmail = errors.New("invalid email")
-	ErrWeakPassword = errors.New("password must be 8 to 72 characters")
-	ErrNameRequired = errors.New("name is required")
-	ErrEmailTaken   = errors.New("email already registered")
+	ErrInvalidEmail       = errors.New("invalid email")
+	ErrWeakPassword       = errors.New("password must be 8 to 72 characters")
+	ErrNameRequired       = errors.New("name is required")
+	ErrEmailTaken         = errors.New("email already registered")
+	ErrInvalidCredentials = errors.New("invalid email or password")
 )
 
 type userStore interface {
 	CreateUser(ctx context.Context, arg db.CreateUserParams) (db.User, error)
+	GetUserByEmail(ctx context.Context, email string) (db.User, error)
 }
 
 func NewService(store userStore) *Service {
