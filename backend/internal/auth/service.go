@@ -8,6 +8,7 @@ import (
 	"net/mail"
 	"strings"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/macemacemace/seraphim/backend/internal/db"
 	"golang.org/x/crypto/bcrypt"
@@ -70,6 +71,28 @@ func (s *Service) Register(ctx context.Context, email, password, name string) (d
 
 	return user, nil
 
+}
+
+func (s *Service) Login(ctx context.Context, email, password string) (db.User, error) {
+	email = strings.TrimSpace(email)
+	email = strings.ToLower(email)
+
+	user, err := s.store.GetUserByEmail(ctx, email)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return db.User{}, ErrInvalidCredentials
+		}
+
+		return db.User{}, fmt.Errorf("get user: %w", err)
+
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+	if err != nil {
+		return db.User{}, ErrInvalidCredentials
+	}
+
+	return user, nil
 }
 
 type Service struct {
