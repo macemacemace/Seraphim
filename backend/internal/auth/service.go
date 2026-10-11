@@ -27,8 +27,8 @@ type userStore interface {
 	GetUserByEmail(ctx context.Context, email string) (db.User, error)
 }
 
-func NewService(store userStore) *Service {
-	return &Service{store: store}
+func NewService(store userStore, secret []byte) *Service {
+	return &Service{store: store, secret: secret}
 }
 
 func (s *Service) Register(ctx context.Context, email, password, name string) (db.User, error) {
@@ -96,5 +96,6 @@ func (s *Service) Login(ctx context.Context, email, password string) (db.User, e
 }
 
 type Service struct {
-	store userStore
+	store  userStore
+	secret []byte
 }

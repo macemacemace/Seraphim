@@ -7,7 +7,7 @@ import (
 )
 
 func TestRegister_WeakPass(t *testing.T) {
-	service := NewService(nil)
+	service := NewService(nil, nil)
 
 	_, err := service.Register(context.Background(), "ana@gmail.com", "abc", "Ana")
 
@@ -17,7 +17,7 @@ func TestRegister_WeakPass(t *testing.T) {
 }
 
 func TestRegister_InvalidEmail(t *testing.T) {
-	service := NewService(nil)
+	service := NewService(nil, nil)
 
 	_, err := service.Register(context.Background(), "ognen", "abcbc2222", "Ana")
 
@@ -27,7 +27,7 @@ func TestRegister_InvalidEmail(t *testing.T) {
 }
 
 func TestRegister_LongPassword(t *testing.T) {
-	service := NewService(nil)
+	service := NewService(nil, nil)
 
 	_, err := service.Register(context.Background(), "ana@gmail.com", "abcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Ana")
 
@@ -36,7 +36,7 @@ func TestRegister_LongPassword(t *testing.T) {
 	}
 }
 func TestRegister_EmptyName(t *testing.T) {
-	service := NewService(nil)
+	service := NewService(nil, nil)
 
 	_, err := service.Register(context.Background(), "ana@gmail.com", "abcbc222", "    ")
 

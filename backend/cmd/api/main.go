@@ -26,6 +26,11 @@ func main() {
 		log.Fatal("DATABASE_URL is not set")
 	}
 
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		log.Fatal("JWT_SECRET is not set")
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8081"
@@ -51,7 +56,7 @@ func main() {
 
 	queries := db.New(pool)
 
-	authService := auth.NewService(queries)
+	authService := auth.NewService(queries, []byte(jwtSecret))
 
 	authHandler := auth.NewHandler(authService)
 
