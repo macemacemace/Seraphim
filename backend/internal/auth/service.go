@@ -73,7 +73,7 @@ func (s *Service) Register(ctx context.Context, email, password, name string) (d
 
 }
 
-func (s *Service) Login(ctx context.Context, email, password string) (db.User, error) {
+func (s *Service) Login(ctx context.Context, email, password string) (string, error) {
 	email = strings.TrimSpace(email)
 	email = strings.ToLower(email)
 
@@ -81,18 +81,18 @@ func (s *Service) Login(ctx context.Context, email, password string) (db.User, e
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return db.User{}, ErrInvalidCredentials
+			return "", ErrInvalidCredentials
 		}
 
-		return db.User{}, fmt.Errorf("get user: %w", err)
+		return "", fmt.Errorf("get user: %w", err)
 
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	if err != nil {
-		return db.User{}, ErrInvalidCredentials
+		return "", ErrInvalidCredentials
 	}
 
-	return user, nil
+	return newAccessToken(user.ID, s.secret)
 }
 
 type Service struct {

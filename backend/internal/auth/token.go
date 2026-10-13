@@ -21,3 +21,18 @@ func newAccessToken(userID uuid.UUID, secret []byte) (string, error) {
 
 	return token.SignedString(secret)
 }
+
+func parseAccessToken(tokenString string, secret []byte) (uuid.UUID,
+	error) {
+	claims := &jwt.RegisteredClaims{}
+
+	_, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (any, error) {
+		return secret, nil
+	}, jwt.WithValidMethods([]string{"HS256"}))
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return uuid.Parse(claims.Subject)
+
+}
