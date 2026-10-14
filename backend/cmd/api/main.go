@@ -64,6 +64,8 @@ func main() {
 
 	api.POST("/auth/login", authHandler.Login)
 
+	api.GET("/me", auth.RequireAuth([]byte(jwtSecret)), authHandler.Me)
+
 	api.GET("/health", func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
 		defer cancel()

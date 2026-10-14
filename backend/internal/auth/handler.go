@@ -89,3 +89,8 @@ func (h *Handler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, loginResponse{Token: token})
 
 }
+
+func (h *Handler) Me(c *gin.Context) {
+	userID := c.MustGet("userID").(uuid.UUID)
+	c.JSON(http.StatusOK, gin.H{"userID": userID})
+}
