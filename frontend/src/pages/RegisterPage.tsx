@@ -29,29 +29,31 @@ export default function RegisterPage() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Create account</h1>
-      <input
-        type="text"
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+    <div className="auth-page">
+      <form onSubmit={handleSubmit} className="auth-form">
+        <h1>Create account</h1>
+        <input
+          type="text"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <div>{error && <p>{error}</p>}</div>
-      <button type="submit">Sign up</button>
-    </form>
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <div>{error && <p>{error}</p>}</div>
+        <button type="submit">Sign up</button>
+      </form>
+    </div>
   );
 }
