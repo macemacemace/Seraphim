@@ -59,5 +59,17 @@ width: 100%;
   align-items: center;
 }
 
+.auth-form p{
+  margin: 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  ;
+}
+
+.auth-form a{
+  color: var(--accent);
+  font-weight: 500;
+}
 
 

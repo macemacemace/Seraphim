@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -53,6 +53,9 @@ export default function RegisterPage() {
         />
         <div>{error && <p>{error}</p>}</div>
         <button type="submit">Sign up</button>
+        <p>
+          Already have an account? <Link to="/login">Log in</Link>
+        </p>
       </form>
     </div>
   );
