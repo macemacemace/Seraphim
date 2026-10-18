@@ -10,6 +10,19 @@ import (
 	"github.com/google/uuid"
 )
 
+type Listing struct {
+	ID          uuid.UUID
+	SellerID    uuid.UUID
+	Type        string
+	Title       string
+	Description string
+	Price       int32
+	Status      string
+	Location    interface{}
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
 type User struct {
 	ID              uuid.UUID
 	Email           string
