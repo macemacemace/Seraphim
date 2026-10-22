@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/macemacemace/seraphim/backend/internal/db"
 )
 
@@ -15,6 +16,7 @@ var (
 	ErrInvalidType   = errors.New("type must be ITEM or SERVICE")
 	ErrTitleRequired = errors.New("title is required")
 	ErrInvalidPrice  = errors.New("price must be 0 or more")
+	ErrNotFound = errors.New("listing not found")
 )
 
 type listingStore interface {
@@ -69,11 +71,29 @@ func (s *Service) Create(ctx context.Context, input CreateInput) (db.CreateListi
 		Lat:         lat,
 		Lng:         lng,
 	})
+
 	if err != nil {
 		return db.CreateListingRow{}, fmt.Errorf("create listing: %w", err)
 
 	}
 
 	return listing, nil
+}
+
+	func (s *Service) Get(ctx context.Context, id uuid.UUID) (db.GetListingRow, error)  {
+		listing, err := s.store.GetListing(ctx, id)
+
+		if err != nil{
+			if errors.Is(err, pgx.ErrNoRows) {
+			return db.GetListingRow{}, ErrNotFound
+		}
+
+		return db.GetListingRow{}, fmt.Errorf("get listing: %w", err)
+	}
+	_ :=
+
+	
+
 
 }
+
