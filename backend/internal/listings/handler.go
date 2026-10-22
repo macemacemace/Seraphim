@@ -1,6 +1,8 @@
 package listings
 
 import (
+	"errors"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -50,8 +52,25 @@ func (h *Handler) Create(c *gin.Context) {
 		Lng:         req.Lng,
 	})
 
-	_ = listing
-	_ = err
+	if err != nil {
+		if errors.Is(err, ErrInvalidType) || errors.Is(err, ErrInvalidPrice) || errors.Is(err, ErrTitleRequired) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		log.Println("create listing:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+		return
+	}
+	c.JSON(http.StatusCreated, createListingResponse{
+		ID:          listing.ID,
+		SellerID:    listing.SellerID,
+		Type:        listing.Type,
+		Title:       listing.Title,
+		Description: listing.Description,
+		Price:       listing.Price,
+		Lat:         listing.Lat,
+		Lng:         listing.Lng,
+	})
 
 }
 

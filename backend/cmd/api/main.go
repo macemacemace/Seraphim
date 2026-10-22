@@ -11,6 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 	"github.com/macemacemace/seraphim/backend/internal/auth"
+	"github.com/macemacemace/seraphim/backend/internal/listings"
 
 	"github.com/macemacemace/seraphim/backend/internal/db"
 )
@@ -65,6 +66,12 @@ func main() {
 	api.POST("/auth/login", authHandler.Login)
 
 	api.GET("/me", auth.RequireAuth([]byte(jwtSecret)), authHandler.Me)
+
+	listingsService := listings.NewService(queries)
+
+	listingsHandler := listings.NewHandler(listingsService)
+
+	api.POST("/listings", auth.RequireAuth([]byte(jwtSecret)), listingsHandler.Create)
 
 	api.GET("/health", func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
