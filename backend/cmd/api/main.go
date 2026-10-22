@@ -73,6 +73,8 @@ func main() {
 
 	api.POST("/listings", auth.RequireAuth([]byte(jwtSecret)), listingsHandler.Create)
 
+	api.GET("/listings/:id", listingsHandler.Get)
+
 	api.GET("/health", func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
 		defer cancel()

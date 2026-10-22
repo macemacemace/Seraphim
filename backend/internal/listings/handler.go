@@ -74,6 +74,39 @@ func (h *Handler) Create(c *gin.Context) {
 
 }
 
+func (h *Handler) Get(c *gin.Context) {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid listing id"})
+		return
+	}
+
+	listing, err := h.service.Get(c.Request.Context(), id)
+
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+
+		log.Println("get listing:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+		return
+
+	}
+
+	c.JSON(http.StatusOK, createListingResponse{
+		ID:          listing.ID,
+		SellerID:    listing.SellerID,
+		Type:        listing.Type,
+		Title:       listing.Title,
+		Description: listing.Description,
+		Price:       listing.Price,
+		Lat:         listing.Lat,
+		Lng:         listing.Lng,
+	})
+}
+
 type Handler struct {
 	service *Service
 }

@@ -73,6 +73,7 @@ func (h *Handler) Login(c *gin.Context) {
 
 		return
 	}
+
 	token, err := h.service.Login(c.Request.Context(), req.Email, req.Password)
 
 	if err != nil {
