@@ -109,6 +109,33 @@ func (h *Handler) Get(c *gin.Context) {
 }
 
 func (h *Handler) ListNearby(c *gin.Context) {
+
+	if c.Query("lat") == "" && c.Query("lng") == "" {
+		listings, err := h.service.ListRecent(c.Request.Context())
+
+		if err != nil {
+
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+			return
+		}
+		response := make([]createListingResponse, 0, len(listings))
+		for _, l := range listings {
+			response = append(response, createListingResponse{
+				ID:          l.ID,
+				SellerID:    l.SellerID,
+				Type:        l.Type,
+				Title:       l.Title,
+				Description: l.Description,
+				Price:       l.Price,
+				Lat:         l.Lat,
+				Lng:         l.Lng,
+			})
+
+		}
+		log.Println("list recent listings:", err)
+		c.JSON(http.StatusOK, response)
+		return
+	}
 	lat, err := strconv.ParseFloat(c.Query("lat"), 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "lat and lng are required numbers"})

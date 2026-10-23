@@ -215,3 +215,67 @@ func (q *Queries) ListNearbyListings(ctx context.Context, arg ListNearbyListings
 	}
 	return items, nil
 }
+
+const listRecentListings = `-- name: ListRecentListings :many
+SELECT id,
+    seller_id,
+    type,
+    title,
+    description,
+    price,
+    status,
+    ST_Y(location::geometry)::float8 AS lat,
+    ST_X(location::geometry)::float8 AS lng,
+    created_at,
+    updated_at
+FROM listings
+WHERE status = 'ACTIVE'
+ORDER BY created_at DESC
+LIMIT 50
+`
+
+type ListRecentListingsRow struct {
+	ID          uuid.UUID
+	SellerID    uuid.UUID
+	Type        string
+	Title       string
+	Description string
+	Price       int32
+	Status      string
+	Lat         float64
+	Lng         float64
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+func (q *Queries) ListRecentListings(ctx context.Context) ([]ListRecentListingsRow, error) {
+	rows, err := q.db.Query(ctx, listRecentListings)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListRecentListingsRow
+	for rows.Next() {
+		var i ListRecentListingsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.SellerID,
+			&i.Type,
+			&i.Title,
+			&i.Description,
+			&i.Price,
+			&i.Status,
+			&i.Lat,
+			&i.Lng,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

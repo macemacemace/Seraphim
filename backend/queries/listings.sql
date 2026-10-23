@@ -61,3 +61,19 @@ WHERE ST_DWithin(
     AND status = 'ACTIVE'
 ORDER BY created_at DESC
 LIMIT 50;
+-- name: ListRecentListings :many
+SELECT id,
+    seller_id,
+    type,
+    title,
+    description,
+    price,
+    status,
+    ST_Y(location::geometry)::float8 AS lat,
+    ST_X(location::geometry)::float8 AS lng,
+    created_at,
+    updated_at
+FROM listings
+WHERE status = 'ACTIVE'
+ORDER BY created_at DESC
+LIMIT 50;

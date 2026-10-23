@@ -24,6 +24,7 @@ type listingStore interface {
 	CreateListing(ctx context.Context, arg db.CreateListingParams) (db.CreateListingRow, error)
 	GetListing(ctx context.Context, id uuid.UUID) (db.GetListingRow, error)
 	ListNearbyListings(ctx context.Context, arg db.ListNearbyListingsParams) ([]db.ListNearbyListingsRow, error)
+	ListRecentListings(ctx context.Context) ([]db.ListRecentListingsRow, error)
 }
 
 type Service struct {
@@ -108,6 +109,18 @@ func (s *Service) ListNearby(ctx context.Context, lat, lng float64) ([]db.ListNe
 
 	if err != nil {
 		return nil, fmt.Errorf("list nearby listings: %w", err)
+	}
+
+	return listings, nil
+
+}
+
+func (s *Service) ListRecent(ctx context.Context) ([]db.ListRecentListingsRow, error) {
+
+	listings, err := s.store.ListRecentListings(ctx)
+
+	if err != nil {
+		return nil, fmt.Errorf("list recent listings: %w", err)
 	}
 
 	return listings, nil
