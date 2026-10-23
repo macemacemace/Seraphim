@@ -13,15 +13,17 @@ import (
 )
 
 var (
-	ErrInvalidType   = errors.New("type must be ITEM or SERVICE")
-	ErrTitleRequired = errors.New("title is required")
-	ErrInvalidPrice  = errors.New("price must be 0 or more")
-	ErrNotFound      = errors.New("listing not found")
+	ErrInvalidType     = errors.New("type must be ITEM or SERVICE")
+	ErrTitleRequired   = errors.New("title is required")
+	ErrInvalidPrice    = errors.New("price must be 0 or more")
+	ErrNotFound        = errors.New("listing not found")
+	ErrInvalidLocation = errors.New("invalid location")
 )
 
 type listingStore interface {
 	CreateListing(ctx context.Context, arg db.CreateListingParams) (db.CreateListingRow, error)
 	GetListing(ctx context.Context, id uuid.UUID) (db.GetListingRow, error)
+	ListNearbyListings(ctx context.Context, arg db.ListNearbyListingsParams) ([]db.ListNearbyListingsRow, error)
 }
 
 type Service struct {
@@ -91,5 +93,23 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID) (db.GetListingRow, erro
 		return db.GetListingRow{}, fmt.Errorf("get listing: %w", err)
 	}
 	return listing, nil
+
+}
+
+func (s *Service) ListNearby(ctx context.Context, lat, lng float64) ([]db.ListNearbyListingsRow, error) {
+	if lat < -90 || lat > 90 || lng < -180 || lng > 180 {
+		return nil, ErrInvalidLocation
+	}
+
+	listings, err := s.store.ListNearbyListings(ctx, db.ListNearbyListingsParams{
+		Lat: lat,
+		Lng: lng,
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("list nearby listings: %w", err)
+	}
+
+	return listings, nil
 
 }

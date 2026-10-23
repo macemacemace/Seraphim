@@ -75,6 +75,7 @@ func main() {
 
 	api.GET("/listings/:id", listingsHandler.Get)
 
+	api.GET("/listings", listingsHandler.ListNearby)
 	api.GET("/health", func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
 		defer cancel()

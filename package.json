@@ -1,8 +1,11 @@
 {
   "private": true,
   "scripts": {
-    "dev": "docker compose up -d && concurrently -n api,web -c blue,green \"cd backend && go run ./cmd/api\" \"npm run dev --prefix frontend -- --open\""
+    "dev": "docker compose up -d && concurrently -n api,web -c blue,green \"cd backend && go run ./cmd/api\" \"npm run dev --prefix frontend -- --open\"",
+    "sqlc": "cd backend && docker run --rm -v \"%cd%:/src\" -w /src sqlc/sqlc:1.31.1 generate"
   },
+
+  
   "devDependencies": {
     "concurrently": "^10.0.6"
   }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -105,6 +106,45 @@ func (h *Handler) Get(c *gin.Context) {
 		Lat:         listing.Lat,
 		Lng:         listing.Lng,
 	})
+}
+
+func (h *Handler) ListNearby(c *gin.Context) {
+	lat, err := strconv.ParseFloat(c.Query("lat"), 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "lat and lng are required numbers"})
+		return
+	}
+	lng, err := strconv.ParseFloat(c.Query("lng"), 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "lat and lng are required numbers"})
+		return
+	}
+
+	listings, err := h.service.ListNearby(c.Request.Context(), lat, lng)
+	if err != nil {
+		if errors.Is(err, ErrInvalidLocation) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		log.Println("list nearby listings:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+		return
+	}
+
+	response := make([]createListingResponse, 0, len(listings))
+	for _, l := range listings {
+		response = append(response, createListingResponse{
+			ID:          l.ID,
+			SellerID:    l.SellerID,
+			Type:        l.Type,
+			Title:       l.Title,
+			Description: l.Description,
+			Price:       l.Price,
+			Lat:         l.Lat,
+			Lng:         l.Lng,
+		})
+	}
+	c.JSON(http.StatusOK, response)
 }
 
 type Handler struct {
