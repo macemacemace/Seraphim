@@ -36,11 +36,16 @@ export default function FeedPage() {
   return (
     <main>
       <h1>Listings</h1>
-      <div>
+      <div className="feed-grid">
         {listings.map((listing) => (
-          <p key={listing.id}>
-            {listing.title}: {listing.price} den
-          </p>
+          <article key={listing.id} className="listing-card">
+            <h2>{listing.title}</h2>
+            <p className="listing-price">
+              {listing.price == 0 && "Free"}
+              {listing.price > 0 && `${listing.price} den`}
+            </p>
+            <p className="listing-type">{listing.type}</p>
+          </article>
         ))}
       </div>
     </main>

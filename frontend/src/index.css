@@ -71,5 +71,34 @@ width: 100%;
   color: var(--accent);
   font-weight: 500;
 }
+.feed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
 
+.listing-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.listing-card h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.listing-price {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.listing-type {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
 
