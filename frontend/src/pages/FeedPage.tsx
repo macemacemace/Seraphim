@@ -13,12 +13,16 @@ type Listing = {
 
 export default function FeedPage() {
   const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     function load(url: string) {
       fetch(url)
         .then((res) => res.json())
-        .then((data: Listing[]) => setListings(data));
+        .then((data: Listing[]) => {
+          setListings(data);
+          setLoading(false);
+        });
     }
 
     navigator.geolocation.getCurrentPosition(
@@ -36,6 +40,22 @@ export default function FeedPage() {
   return (
     <main>
       <h1>Listings</h1>
+      {loading && (
+        <div className="feed-loading">
+          <div className="dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <p className="feed-message">Finding listings near you...</p>
+        </div>
+      )}
+
+      {!loading && listings.length === 0 && (
+        <p className="feed-message">
+          No listings nearby yet. Be the first to sell something!
+        </p>
+      )}
       <div className="feed-grid">
         {listings.map((listing) => (
           <article key={listing.id} className="listing-card">
