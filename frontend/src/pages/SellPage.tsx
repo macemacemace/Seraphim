@@ -39,6 +39,12 @@ export default function SellPage() {
           }),
         });
         const data = await res.json();
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login");
+          return;
+        }
+
         if (!res.ok) {
           setError(data.error);
           return;
@@ -50,33 +56,59 @@ export default function SellPage() {
     );
   }
 
+  let itemClass = "type-option";
+
+  if (type === "ITEM") {
+    itemClass = "type-option selected";
+  }
+
+  let serviceClass = "type-option";
+
+  if (type === "SERVICE") {
+    serviceClass = "type-option selected";
+  }
+
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Sell something</h1>
-      <input
-        placeholder="What are you selling?"
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <select value={type} onChange={(e) => setType(e.target.value)}>
-        <option value="ITEM">Item</option>
-        <option value="SERVICE">Service</option>
-      </select>
-      <input
-        placeholder="Price in MKD"
-        type="number"
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
-      />
-      <textarea
-        placeholder="Description"
-        name="description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      ></textarea>
-      {error && <p>{error}</p>}
-      <button>Submit listing</button>
-    </form>
+    <div className="auth-page">
+      <form onSubmit={handleSubmit} className="auth-form">
+        <h1>Sell something</h1>
+        <input
+          placeholder="What are you selling?"
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <div className="type-toggle">
+          <button
+            type="button"
+            className={itemClass}
+            onClick={() => setType("ITEM")}
+          >
+            Item
+          </button>
+          <button
+            type="button"
+            className={serviceClass}
+            onClick={() => setType("SERVICE")}
+          >
+            Service
+          </button>
+        </div>
+        <input
+          placeholder="Price in MKD"
+          type="number"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+        <textarea
+          placeholder="Description"
+          name="description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        ></textarea>
+        {error && <p>{error}</p>}
+        <button>Submit listing</button>
+      </form>
+    </div>
   );
 }
