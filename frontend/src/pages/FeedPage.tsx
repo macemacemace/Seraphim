@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 
 type Listing = {
   id: string;
@@ -39,7 +40,12 @@ export default function FeedPage() {
 
   return (
     <main>
-      <h1>Listings</h1>
+      <div className="feed-header">
+        <h1>Listings</h1>
+        <Link to="/sell" className="sell-button">
+          Sell something
+        </Link>
+      </div>
       {loading && (
         <div className="feed-loading">
           <div className="dots">

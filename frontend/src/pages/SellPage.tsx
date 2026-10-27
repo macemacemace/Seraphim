@@ -7,12 +7,14 @@ export default function SellPage() {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const navigate = useNavigate();
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
+    setSubmitting(true);
 
     const token = localStorage.getItem("token");
 
@@ -47,12 +49,16 @@ export default function SellPage() {
 
         if (!res.ok) {
           setError(data.error);
+          setSubmitting(false);
           return;
         }
 
         navigate("/");
       },
-      () => setError("We need your location to post a listing"),
+      () => {
+        setError("We need your location to post a listing");
+        setSubmitting(false);
+      },
     );
   }
 
@@ -66,6 +72,11 @@ export default function SellPage() {
 
   if (type === "SERVICE") {
     serviceClass = "type-option selected";
+  }
+
+  let buttonText = "Submit listing";
+  if (submitting) {
+    buttonText = "Posting...";
   }
 
   return (
@@ -107,7 +118,7 @@ export default function SellPage() {
           onChange={(e) => setDescription(e.target.value)}
         ></textarea>
         {error && <p>{error}</p>}
-        <button>Submit listing</button>
+        <button disabled={submitting}>{buttonText}</button>
       </form>
     </div>
   );
