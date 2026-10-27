@@ -1,16 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-
-type Listing = {
-  id: string;
-  title: string;
-  price: number;
-  sellerId: string;
-  type: string;
-  description: string;
-  lat: number;
-  lng: number;
-};
+import type { Listing } from "../types";
 
 export default function FeedPage() {
   const [listings, setListings] = useState<Listing[]>([]);
@@ -64,14 +54,20 @@ export default function FeedPage() {
       )}
       <div className="feed-grid">
         {listings.map((listing) => (
-          <article key={listing.id} className="listing-card">
-            <h2>{listing.title}</h2>
-            <p className="listing-price">
-              {listing.price == 0 && "Free"}
-              {listing.price > 0 && `${listing.price} den`}
-            </p>
-            <p className="listing-type">{listing.type}</p>
-          </article>
+          <Link
+            key={listing.id}
+            to={`/listings/${listing.id}`}
+            className="card-link"
+          >
+            <article key={listing.id} className="listing-card">
+              <h2>{listing.title}</h2>
+              <p className="listing-price">
+                {listing.price == 0 && "Free"}
+                {listing.price > 0 && `${listing.price} den`}
+              </p>
+              <p className="listing-type">{listing.type}</p>
+            </article>
+          </Link>
         ))}
       </div>
     </main>
