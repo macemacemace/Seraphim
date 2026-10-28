@@ -23,6 +23,15 @@ type Listing struct {
 	UpdatedAt   time.Time
 }
 
+type ListingPhoto struct {
+	ID        uuid.UUID
+	ListingID uuid.UUID
+	Url       string
+	PublicID  string
+	Position  int32
+	CreatedAt time.Time
+}
+
 type User struct {
 	ID              uuid.UUID
 	Email           string
