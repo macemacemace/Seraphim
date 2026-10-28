@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"io"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -172,8 +174,83 @@ func (h *Handler) ListNearby(c *gin.Context) {
 		})
 	}
 	c.JSON(http.StatusOK, response)
+
 }
 
 type Handler struct {
 	service *Service
+}
+
+const maxPhotoSize = 5 << 20
+
+func (h *Handler) AddPhoto(c *gin.Context) {
+	sellerID := c.MustGet("userID").(uuid.UUID)
+
+	listingID, err := uuid.Parse(c.Param("id"))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid listing id"})
+		return
+	}
+
+	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, maxPhotoSize+1024)
+
+	fileHeader, err := c.FormFile("photo")
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "photo is required and must be under 5MB"})
+		return
+	}
+
+	file, err := fileHeader.Open()
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "could not read photo"})
+		return
+	}
+
+	defer file.Close()
+
+	head := make([]byte, 512)
+	n, err := file.Read(head)
+	if err != nil && err != io.EOF {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "could not read photo"})
+		return
+	}
+
+	contentType := http.DetectContentType(head[:n])
+	if contentType != "image/png" && contentType != "image/jpeg" && contentType != "image/webp" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "photo must be JPG, PNG or WebP"})
+		return
+	}
+
+	if _, err := file.Seek(0, io.SeekStart); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+		return
+	}
+
+	photo, err := h.service.AddPhoto(c.Request.Context(), listingID, sellerID, file)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		if errors.Is(err, ErrNotYourListing) {
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		}
+		if errors.Is(err, ErrTooManyPhotos) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+
+		log.Println("add photo:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, photoResponse{
+		ID:       photo.ID,
+		URL:      photo.Url,
+		Position: photo.Position,
+	})
+
 }
