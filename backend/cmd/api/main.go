@@ -12,6 +12,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/macemacemace/seraphim/backend/internal/auth"
 	"github.com/macemacemace/seraphim/backend/internal/listings"
+	"github.com/macemacemace/seraphim/backend/internal/storage"
 
 	"github.com/macemacemace/seraphim/backend/internal/db"
 )
@@ -30,6 +31,18 @@ func main() {
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
 		log.Fatal("JWT_SECRET is not set")
+	}
+
+	cloudName := os.Getenv("CLOUDINARY_CLOUD_NAME")
+	cloudApiKey := os.Getenv("CLOUDINARY_API_KEY")
+	cloudSecret := os.Getenv("CLOUDINARY_API_SECRET")
+	if cloudName == "" || cloudApiKey == "" || cloudSecret == "" {
+		log.Fatal("CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET must be set")
+	}
+
+	photos, err := storage.NewCloudinary(cloudName, cloudApiKey, cloudSecret)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	port := os.Getenv("PORT")
@@ -67,7 +80,7 @@ func main() {
 
 	api.GET("/me", auth.RequireAuth([]byte(jwtSecret)), authHandler.Me)
 
-	listingsService := listings.NewService(queries)
+	listingsService := listings.NewService(queries, photos)
 
 	listingsHandler := listings.NewHandler(listingsService)
 
@@ -91,4 +104,5 @@ func main() {
 	if err := router.Run(":" + port); err != nil {
 		log.Fatalf("server stopped: %v", err)
 	}
+
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"math"
 	"strings"
 
@@ -18,6 +19,8 @@ var (
 	ErrInvalidPrice    = errors.New("price must be 0 or more")
 	ErrNotFound        = errors.New("listing not found")
 	ErrInvalidLocation = errors.New("invalid location")
+	ErrNotYourListing  = errors.New("you can only add photos to your own listings")
+	ErrTooManyPhotos   = errors.New("a listing can have at most 5 photos")
 )
 
 type listingStore interface {
@@ -25,14 +28,22 @@ type listingStore interface {
 	GetListing(ctx context.Context, id uuid.UUID) (db.GetListingRow, error)
 	ListNearbyListings(ctx context.Context, arg db.ListNearbyListingsParams) ([]db.ListNearbyListingsRow, error)
 	ListRecentListings(ctx context.Context) ([]db.ListRecentListingsRow, error)
+	CreateListingPhoto(ctx context.Context, arg db.CreateListingPhotoParams) (db.ListingPhoto, error)
+	ListListingPhotos(ctx context.Context, listingID uuid.UUID) ([]db.ListingPhoto, error)
+}
+
+type photoUploader interface {
+	Upload(ctx context.Context, file io.Reader) (string, string, error)
 }
 
 type Service struct {
-	store listingStore
+	store  listingStore
+	photos photoUploader
 }
 
-func NewService(store listingStore) *Service {
-	return &Service{store: store}
+func NewService(store listingStore, photos photoUploader) *Service {
+	return &Service{store: store, photos: photos}
+
 }
 
 type CreateInput struct {
@@ -125,4 +136,35 @@ func (s *Service) ListRecent(ctx context.Context) ([]db.ListRecentListingsRow, e
 
 	return listings, nil
 
+}
+
+func (s *Service) AddPhoto(ctx context.Context, listingID, sellerID uuid.UUID, file io.Reader) (db.ListingPhoto, error) {
+	listing, err := s.Get(ctx, listingID)
+	if err != nil {
+		return db.ListingPhoto{}, err
+	}
+
+	if listing.SellerID != sellerID {
+		return db.ListingPhoto{}, ErrNotYourListing
+	}
+
+	existing, err := s.store.ListListingPhotos(ctx, listingID)
+	if err != nil {
+		return db.ListingPhoto{}, fmt.Errorf("list photos: %w", err)
+	}
+
+	if len(existing) >= 5 {
+		return db.ListingPhoto{}, ErrTooManyPhotos
+	}
+
+	url, publicID, err := s.photos.Upload(ctx, file)
+	if err != nil {
+		return db.ListingPhoto{}, err
+	}
+	return s.store.CreateListingPhoto(ctx, db.CreateListingPhotoParams{
+		ListingID: listingID,
+		Url:       url,
+		PublicID:  publicID,
+		Position:  int32(len(existing)),
+	})
 }
