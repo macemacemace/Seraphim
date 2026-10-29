@@ -8,12 +8,21 @@ export default function SellPage() {
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [photos, setPhotos] = useState<File[]>([]);
 
   const navigate = useNavigate();
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
+    if (photos.length > 5) {
+      setError("you can add up to 5 photos");
+      return;
+    }
+    if (photos.length === 0 && type === "ITEM") {
+      setError("items need atleast one photo");
+      return;
+    }
     setSubmitting(true);
 
     const token = localStorage.getItem("token");
@@ -51,6 +60,25 @@ export default function SellPage() {
           setError(data.error);
           setSubmitting(false);
           return;
+        }
+
+        for (const photo of photos) {
+          const formData = new FormData();
+          formData.append("photo", photo);
+
+          const photoRes = await fetch(`/api/listings/${data.id}/photos`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+          });
+          if (!photoRes.ok) {
+            const photoData = await photoRes.json();
+            setError(photoData.error);
+            setSubmitting(false);
+            return;
+          }
         }
 
         navigate("/");
@@ -117,6 +145,18 @@ export default function SellPage() {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         ></textarea>
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+          onChange={(e) => {
+            if (e.target.files) {
+              setPhotos(Array.from(e.target.files));
+            }
+          }}
+        />
+
+        {photos.length > 0 && <p>{photos.length} photos selected</p>}
         {error && <p>{error}</p>}
         <button disabled={submitting}>{buttonText}</button>
       </form>
