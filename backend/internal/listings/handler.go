@@ -17,6 +17,11 @@ type photoResponse struct {
 	URL      string    `json:"url"`
 	Position int32     `json:"position"`
 }
+
+type listingDetailResponse struct {
+	createListingResponse
+	Photos []photoResponse `json:"photos"`
+}
 type createListingRequest struct {
 	Type        string  `json:"type"`
 	Title       string  `json:"title"`
