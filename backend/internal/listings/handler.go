@@ -12,6 +12,11 @@ import (
 	"github.com/google/uuid"
 )
 
+type photoResponse struct {
+	ID       uuid.UUID `json:"id"`
+	URL      string    `json:"url"`
+	Position int32     `json:"position"`
+}
 type createListingRequest struct {
 	Type        string  `json:"type"`
 	Title       string  `json:"title"`
@@ -237,9 +242,11 @@ func (h *Handler) AddPhoto(c *gin.Context) {
 		}
 		if errors.Is(err, ErrNotYourListing) {
 			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			return
 		}
 		if errors.Is(err, ErrTooManyPhotos) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
 		}
 
 		log.Println("add photo:", err)
