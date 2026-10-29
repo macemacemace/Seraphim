@@ -247,3 +247,8 @@ width: 100%;
   text-decoration: none;
   color: inherit;
 }
+
+img.listing-photo {
+  object-fit: cover;
+  width: 100%;
+}
