@@ -103,16 +103,37 @@ func (h *Handler) Get(c *gin.Context) {
 
 	}
 
-	c.JSON(http.StatusOK, createListingResponse{
-		ID:          listing.ID,
-		SellerID:    listing.SellerID,
-		Type:        listing.Type,
-		Title:       listing.Title,
-		Description: listing.Description,
-		Price:       listing.Price,
-		Lat:         listing.Lat,
-		Lng:         listing.Lng,
+	photos, err := h.service.ListingPhotos(c.Request.Context(), id)
+
+	if err != nil {
+		log.Println("list photos: ", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+		return
+	}
+
+	photoList := make([]photoResponse, 0, len(photos))
+	for _, p := range photos {
+		photoList = append(photoList, photoResponse{
+			ID:       p.ID,
+			URL:      p.Url,
+			Position: p.Position,
+		})
+	}
+
+	c.JSON(http.StatusOK, listingDetailResponse{
+		createListingResponse: createListingResponse{
+			ID:          listing.ID,
+			SellerID:    listing.SellerID,
+			Type:        listing.Type,
+			Title:       listing.Title,
+			Description: listing.Description,
+			Price:       listing.Price,
+			Lat:         listing.Lat,
+			Lng:         listing.Lng,
+		},
+		Photos: photoList,
 	})
+
 }
 
 func (h *Handler) ListNearby(c *gin.Context) {

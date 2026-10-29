@@ -1,3 +1,9 @@
+export type Photo = {
+  id: string;
+  url: string;
+  position: number;
+};
+
 
 
 
@@ -10,4 +16,5 @@ export type Listing = {
   description: string;
   lat: number;
   lng: number;
+  photos?: Photo[];
 };

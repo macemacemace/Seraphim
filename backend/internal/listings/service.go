@@ -56,6 +56,11 @@ type CreateInput struct {
 	Lng         float64
 }
 
+type listingDetailResponse struct {
+	createListingResponse
+	Photos []photoResponse `json:"photos"`
+}
+
 func (s *Service) Create(ctx context.Context, input CreateInput) (db.CreateListingRow, error) {
 
 	input.Title = strings.TrimSpace(input.Title)
@@ -167,4 +172,16 @@ func (s *Service) AddPhoto(ctx context.Context, listingID, sellerID uuid.UUID, f
 		PublicID:  publicID,
 		Position:  int32(len(existing)),
 	})
+
+}
+
+func (s *Service) ListingPhotos(ctx context.Context, listingID uuid.UUID) ([]db.ListingPhoto, error) {
+
+	photos, err := s.store.ListListingPhotos(ctx, listingID)
+
+	if err != nil {
+		return nil, fmt.Errorf("list recent photos: %w", err)
+	}
+
+	return photos, nil
 }

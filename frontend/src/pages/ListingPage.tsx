@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import type { Listing } from "../types";
+import type { Listing, Photo } from "../types";
 import { Link } from "react-router";
 
 export default function ListingPage() {
@@ -42,12 +42,24 @@ export default function ListingPage() {
   if (listing.type === "SERVICE") {
     icon = "🛠️";
   }
+
+  let photos: Photo[] = [];
+  if (listing.photos) {
+    photos = listing.photos;
+  }
   return (
     <main className="listing-page">
       <Link to="/" className="back-link">
         ← Back to listings
       </Link>
-      <div className="listing-photo">{icon}</div>
+      {photos.length === 0 && <div className="listing-photo">{icon}</div>}
+      {photos.length > 0 && (
+        <img
+          className="listing-photo"
+          src={photos[0].url}
+          alt={listing.title}
+        />
+      )}
 
       <h1>{listing.title}</h1>
       <p className="listing-price">

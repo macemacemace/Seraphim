@@ -12,6 +12,10 @@ export default function SellPage() {
 
   const navigate = useNavigate();
 
+  function removePhoto(index: number) {
+    setPhotos(photos.filter((_, i) => i !== index));
+  }
+
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
@@ -151,12 +155,26 @@ export default function SellPage() {
           multiple
           onChange={(e) => {
             if (e.target.files) {
-              setPhotos(Array.from(e.target.files));
+              const picked = Array.from(e.target.files);
+
+              setPhotos([...photos, ...picked]);
             }
+            e.target.value = "";
           }}
         />
 
-        {photos.length > 0 && <p>{photos.length} photos selected</p>}
+        {photos.length > 0 && (
+          <ul className="photo-list">
+            {photos.map((photo, index) => (
+              <li key={index}>
+                {photo.name}
+                <button type="button" onClick={() => removePhoto(index)}>
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
         {error && <p>{error}</p>}
         <button disabled={submitting}>{buttonText}</button>
       </form>
