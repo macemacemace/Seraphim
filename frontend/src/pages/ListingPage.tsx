@@ -7,6 +7,7 @@ export default function ListingPage() {
   const { id } = useParams();
   const [listing, setListing] = useState<Listing | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [selected, setSelected] = useState(0);
 
   useEffect(() => {
     fetch(`/api/listings/${id}`)
@@ -47,6 +48,22 @@ export default function ListingPage() {
   if (listing.photos) {
     photos = listing.photos;
   }
+
+  function showNext() {
+    if (selected === photos.length - 1) {
+      setSelected(0);
+    } else {
+      setSelected(selected + 1);
+    }
+  }
+
+  function showPrevious() {
+    if (selected === 0) {
+      setSelected(photos.length - 1);
+    } else {
+      setSelected(selected - 1);
+    }
+  }
   return (
     <main className="listing-page">
       <Link to="/" className="back-link">
@@ -54,11 +71,23 @@ export default function ListingPage() {
       </Link>
       {photos.length === 0 && <div className="listing-photo">{icon}</div>}
       {photos.length > 0 && (
-        <img
-          className="listing-photo"
-          src={photos[0].url}
-          alt={listing.title}
-        />
+        <div className="photo-viewer">
+          <img
+            className="listing-photo"
+            src={photos[selected].url}
+            alt={listing.title}
+          />
+          <button
+            className="photo-arrow prev"
+            type="button"
+            onClick={showPrevious}
+          >
+            ‹
+          </button>
+          <button className="photo-arrow next" type="button" onClick={showNext}>
+            ›
+          </button>
+        </div>
       )}
 
       <h1>{listing.title}</h1>

@@ -252,3 +252,29 @@ img.listing-photo {
   object-fit: cover;
   width: 100%;
 }
+
+.photo-viewer {
+  position: relative;
+}
+
+.photo-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--border);
+  color: var(--accent);
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.photo-arrow.prev {
+  left: 12px;
+}
+
+.photo-arrow.next {
+  right : 12px;
+}
