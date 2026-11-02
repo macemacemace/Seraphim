@@ -77,16 +77,25 @@ export default function ListingPage() {
             src={photos[selected].url}
             alt={listing.title}
           />
-          <button
-            className="photo-arrow prev"
-            type="button"
-            onClick={showPrevious}
-          >
-            ‹
-          </button>
-          <button className="photo-arrow next" type="button" onClick={showNext}>
-            ›
-          </button>
+
+          {photos.length > 1 && (
+            <>
+              <button
+                className="photo-arrow prev"
+                type="button"
+                onClick={showPrevious}
+              >
+                ‹
+              </button>
+              <button
+                className="photo-arrow next"
+                type="button"
+                onClick={showNext}
+              >
+                ›
+              </button>
+            </>
+          )}
         </div>
       )}
 
