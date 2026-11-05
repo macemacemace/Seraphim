@@ -51,7 +51,16 @@ SELECT id,
     ST_Y(location::geometry)::float8 AS lat,
     ST_X(location::geometry)::float8 AS lng,
     created_at,
-    updated_at
+    updated_at,
+    COALESCE(
+        (
+            SELECT url
+            FROM listing_photos
+            WHERE listing_photos.listing_id = listings.id
+            ORDER BY position
+            LIMIT 1
+        ), ''
+    )::text AS cover_url
 FROM listings
 WHERE ST_DWithin(
         location,
@@ -59,7 +68,7 @@ WHERE ST_DWithin(
         50000
     )
     AND status = 'ACTIVE'
-ORDER BY created_at DESC
+ORDER BY listings.created_at DESC
 LIMIT 50;
 -- name: ListRecentListings :many
 SELECT id,
@@ -72,8 +81,17 @@ SELECT id,
     ST_Y(location::geometry)::float8 AS lat,
     ST_X(location::geometry)::float8 AS lng,
     created_at,
-    updated_at
+    updated_at,
+    COALESCE(
+        (
+            SELECT url
+            FROM listing_photos
+            WHERE listing_photos.listing_id = listings.id
+            ORDER BY position
+            LIMIT 1
+        ), ''
+    )::text AS cover_url
 FROM listings
 WHERE status = 'ACTIVE'
-ORDER BY created_at DESC
+ORDER BY listings.created_at DESC
 LIMIT 50;

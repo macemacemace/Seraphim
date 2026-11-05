@@ -153,7 +153,16 @@ SELECT id,
     ST_Y(location::geometry)::float8 AS lat,
     ST_X(location::geometry)::float8 AS lng,
     created_at,
-    updated_at
+    updated_at,
+    COALESCE(
+        (
+            SELECT url
+            FROM listing_photos
+            WHERE listing_photos.listing_id = listings.id
+            ORDER BY position
+            LIMIT 1
+        ), ''
+    )::text AS cover_url
 FROM listings
 WHERE ST_DWithin(
         location,
@@ -161,7 +170,7 @@ WHERE ST_DWithin(
         50000
     )
     AND status = 'ACTIVE'
-ORDER BY created_at DESC
+ORDER BY listings.created_at DESC
 LIMIT 50
 `
 
@@ -182,6 +191,7 @@ type ListNearbyListingsRow struct {
 	Lng         float64
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+	CoverUrl    string
 }
 
 func (q *Queries) ListNearbyListings(ctx context.Context, arg ListNearbyListingsParams) ([]ListNearbyListingsRow, error) {
@@ -205,6 +215,7 @@ func (q *Queries) ListNearbyListings(ctx context.Context, arg ListNearbyListings
 			&i.Lng,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.CoverUrl,
 		); err != nil {
 			return nil, err
 		}
@@ -227,10 +238,19 @@ SELECT id,
     ST_Y(location::geometry)::float8 AS lat,
     ST_X(location::geometry)::float8 AS lng,
     created_at,
-    updated_at
+    updated_at,
+    COALESCE(
+        (
+            SELECT url
+            FROM listing_photos
+            WHERE listing_photos.listing_id = listings.id
+            ORDER BY position
+            LIMIT 1
+        ), ''
+    )::text AS cover_url
 FROM listings
 WHERE status = 'ACTIVE'
-ORDER BY created_at DESC
+ORDER BY listings.created_at DESC
 LIMIT 50
 `
 
@@ -246,6 +266,7 @@ type ListRecentListingsRow struct {
 	Lng         float64
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+	CoverUrl    string
 }
 
 func (q *Queries) ListRecentListings(ctx context.Context) ([]ListRecentListingsRow, error) {
@@ -269,6 +290,7 @@ func (q *Queries) ListRecentListings(ctx context.Context) ([]ListRecentListingsR
 			&i.Lng,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.CoverUrl,
 		); err != nil {
 			return nil, err
 		}

@@ -12,6 +12,10 @@ import (
 	"github.com/google/uuid"
 )
 
+type feedListingResponse struct {
+	createListingResponse
+	CoverURL string `json:"coverUrl"`
+}
 type photoResponse struct {
 	ID       uuid.UUID `json:"id"`
 	URL      string    `json:"url"`
@@ -147,25 +151,27 @@ func (h *Handler) ListNearby(c *gin.Context) {
 		listings, err := h.service.ListRecent(c.Request.Context())
 
 		if err != nil {
-
+			log.Println("list recent listings:", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
 			return
 		}
-		response := make([]createListingResponse, 0, len(listings))
+		response := make([]feedListingResponse, 0, len(listings))
 		for _, l := range listings {
-			response = append(response, createListingResponse{
-				ID:          l.ID,
-				SellerID:    l.SellerID,
-				Type:        l.Type,
-				Title:       l.Title,
-				Description: l.Description,
-				Price:       l.Price,
-				Lat:         l.Lat,
-				Lng:         l.Lng,
+			response = append(response, feedListingResponse{
+				createListingResponse: createListingResponse{
+					ID:          l.ID,
+					SellerID:    l.SellerID,
+					Type:        l.Type,
+					Title:       l.Title,
+					Description: l.Description,
+					Price:       l.Price,
+					Lat:         l.Lat,
+					Lng:         l.Lng,
+				},
+				CoverURL: l.CoverUrl,
 			})
 
 		}
-		log.Println("list recent listings:", err)
 		c.JSON(http.StatusOK, response)
 		return
 	}
@@ -191,17 +197,20 @@ func (h *Handler) ListNearby(c *gin.Context) {
 		return
 	}
 
-	response := make([]createListingResponse, 0, len(listings))
+	response := make([]feedListingResponse, 0, len(listings))
 	for _, l := range listings {
-		response = append(response, createListingResponse{
-			ID:          l.ID,
-			SellerID:    l.SellerID,
-			Type:        l.Type,
-			Title:       l.Title,
-			Description: l.Description,
-			Price:       l.Price,
-			Lat:         l.Lat,
-			Lng:         l.Lng,
+		response = append(response, feedListingResponse{
+			createListingResponse: createListingResponse{
+				ID:          l.ID,
+				SellerID:    l.SellerID,
+				Type:        l.Type,
+				Title:       l.Title,
+				Description: l.Description,
+				Price:       l.Price,
+				Lat:         l.Lat,
+				Lng:         l.Lng,
+			},
+			CoverURL: l.CoverUrl,
 		})
 	}
 	c.JSON(http.StatusOK, response)
