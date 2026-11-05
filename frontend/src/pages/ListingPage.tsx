@@ -64,6 +64,7 @@ export default function ListingPage() {
       setSelected(selected - 1);
     }
   }
+
   return (
     <main className="listing-page">
       <Link to="/" className="back-link">
@@ -71,32 +72,57 @@ export default function ListingPage() {
       </Link>
       {photos.length === 0 && <div className="listing-photo">{icon}</div>}
       {photos.length > 0 && (
-        <div className="photo-viewer">
-          <img
-            className="listing-photo"
-            src={photos[selected].url}
-            alt={listing.title}
-          />
+        <>
+          <div className="photo-viewer">
+            <img
+              className="listing-photo"
+              src={photos[selected].url}
+              alt={listing.title}
+            />
 
-          {photos.length > 1 && (
-            <>
-              <button
-                className="photo-arrow prev"
-                type="button"
-                onClick={showPrevious}
-              >
-                ‹
-              </button>
-              <button
-                className="photo-arrow next"
-                type="button"
-                onClick={showNext}
-              >
-                ›
-              </button>
-            </>
-          )}
-        </div>
+            {photos.length > 1 && (
+              <>
+                <button
+                  className="photo-arrow prev"
+                  type="button"
+                  onClick={showPrevious}
+                >
+                  ‹
+                </button>
+                <button
+                  className="photo-arrow next"
+                  type="button"
+                  onClick={showNext}
+                >
+                  ›
+                </button>
+              </>
+            )}
+          </div>
+
+          <div className="thumbnails">
+            {photos.map((photo, index) => {
+              let thumbClass = "thumbnail";
+              if (index === selected) {
+                thumbClass = "thumbnail selected";
+              }
+
+              return (
+                <button
+                  key={photo.id}
+                  type="button"
+                  className={thumbClass}
+                  onClick={() => setSelected(index)}
+                >
+                  <img
+                    src={photo.url}
+                    alt={`${listing.title} photo ${index + 1}`}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        </>
       )}
 
       <h1>{listing.title}</h1>
