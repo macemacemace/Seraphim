@@ -10,6 +10,8 @@ export default function FeedPage() {
   const q = searchParams.get("q") || "";
   const [text, setText] = useState(q);
 
+  const query = searchParams.toString();
+
   function handleSearch(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -25,7 +27,12 @@ export default function FeedPage() {
   useEffect(() => {
     function load(url: string) {
       fetch(url)
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) {
+            return [];
+          }
+          return res.json();
+        })
         .then((data: Listing[]) => {
           setListings(data);
           setLoading(false);
@@ -35,14 +42,14 @@ export default function FeedPage() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         load(
-          `/api/listings?q=${encodeURIComponent(q)}&lat=${pos.coords.latitude}&lng=${pos.coords.longitude}`,
+          `/api/listings?${query}&lat=${pos.coords.latitude}&lng=${pos.coords.longitude}`,
         );
       },
       () => {
-        load(`/api/listings?q=${encodeURIComponent(q)}`);
+        load(`/api/listings?${query}`);
       },
     );
-  }, [q]);
+  }, [query]);
 
   return (
     <main>
