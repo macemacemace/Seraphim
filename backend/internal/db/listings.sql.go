@@ -170,13 +170,19 @@ WHERE ST_DWithin(
         50000
     )
     AND status = 'ACTIVE'
+    AND (
+        $3::text = ''
+        OR title ILIKE '%' || $3 || '%'
+        OR description ILIKE '%' || $3 || '%'
+    )
 ORDER BY listings.created_at DESC
 LIMIT 50
 `
 
 type ListNearbyListingsParams struct {
-	Lng float64
-	Lat float64
+	Lng    float64
+	Lat    float64
+	Search string
 }
 
 type ListNearbyListingsRow struct {
@@ -195,7 +201,7 @@ type ListNearbyListingsRow struct {
 }
 
 func (q *Queries) ListNearbyListings(ctx context.Context, arg ListNearbyListingsParams) ([]ListNearbyListingsRow, error) {
-	rows, err := q.db.Query(ctx, listNearbyListings, arg.Lng, arg.Lat)
+	rows, err := q.db.Query(ctx, listNearbyListings, arg.Lng, arg.Lat, arg.Search)
 	if err != nil {
 		return nil, err
 	}
@@ -250,6 +256,11 @@ SELECT id,
     )::text AS cover_url
 FROM listings
 WHERE status = 'ACTIVE'
+    AND (
+        $1::text = ''
+        OR title ILIKE '%' || $1 || '%'
+        OR description ILIKE '%' || $1 || '%'
+    )
 ORDER BY listings.created_at DESC
 LIMIT 50
 `
@@ -269,8 +280,8 @@ type ListRecentListingsRow struct {
 	CoverUrl    string
 }
 
-func (q *Queries) ListRecentListings(ctx context.Context) ([]ListRecentListingsRow, error) {
-	rows, err := q.db.Query(ctx, listRecentListings)
+func (q *Queries) ListRecentListings(ctx context.Context, search string) ([]ListRecentListingsRow, error) {
+	rows, err := q.db.Query(ctx, listRecentListings, search)
 	if err != nil {
 		return nil, err
 	}

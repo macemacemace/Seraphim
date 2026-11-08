@@ -27,7 +27,7 @@ type listingStore interface {
 	CreateListing(ctx context.Context, arg db.CreateListingParams) (db.CreateListingRow, error)
 	GetListing(ctx context.Context, id uuid.UUID) (db.GetListingRow, error)
 	ListNearbyListings(ctx context.Context, arg db.ListNearbyListingsParams) ([]db.ListNearbyListingsRow, error)
-	ListRecentListings(ctx context.Context) ([]db.ListRecentListingsRow, error)
+	ListRecentListings(ctx context.Context, search string) ([]db.ListRecentListingsRow, error)
 	CreateListingPhoto(ctx context.Context, arg db.CreateListingPhotoParams) (db.ListingPhoto, error)
 	ListListingPhotos(ctx context.Context, listingID uuid.UUID) ([]db.ListingPhoto, error)
 }
@@ -108,14 +108,15 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID) (db.GetListingRow, erro
 
 }
 
-func (s *Service) ListNearby(ctx context.Context, lat, lng float64) ([]db.ListNearbyListingsRow, error) {
+func (s *Service) ListNearby(ctx context.Context, lat, lng float64, search string) ([]db.ListNearbyListingsRow, error) {
 	if lat < -90 || lat > 90 || lng < -180 || lng > 180 {
 		return nil, ErrInvalidLocation
 	}
 
 	listings, err := s.store.ListNearbyListings(ctx, db.ListNearbyListingsParams{
-		Lat: lat,
-		Lng: lng,
+		Lat:    lat,
+		Lng:    lng,
+		Search: search,
 	})
 
 	if err != nil {
@@ -126,9 +127,9 @@ func (s *Service) ListNearby(ctx context.Context, lat, lng float64) ([]db.ListNe
 
 }
 
-func (s *Service) ListRecent(ctx context.Context) ([]db.ListRecentListingsRow, error) {
+func (s *Service) ListRecent(ctx context.Context, search string) ([]db.ListRecentListingsRow, error) {
 
-	listings, err := s.store.ListRecentListings(ctx)
+	listings, err := s.store.ListRecentListings(ctx, search)
 
 	if err != nil {
 		return nil, fmt.Errorf("list recent listings: %w", err)

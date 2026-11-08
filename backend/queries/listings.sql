@@ -68,6 +68,11 @@ WHERE ST_DWithin(
         50000
     )
     AND status = 'ACTIVE'
+    AND (
+        @search::text = ''
+        OR title ILIKE '%' || @search || '%'
+        OR description ILIKE '%' || @search || '%'
+    )
 ORDER BY listings.created_at DESC
 LIMIT 50;
 -- name: ListRecentListings :many
@@ -93,5 +98,10 @@ SELECT id,
     )::text AS cover_url
 FROM listings
 WHERE status = 'ACTIVE'
+    AND (
+        @search::text = ''
+        OR title ILIKE '%' || @search || '%'
+        OR description ILIKE '%' || @search || '%'
+    )
 ORDER BY listings.created_at DESC
 LIMIT 50;

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"io"
 
@@ -146,9 +147,11 @@ func (h *Handler) Get(c *gin.Context) {
 }
 
 func (h *Handler) ListNearby(c *gin.Context) {
+	search := strings.TrimSpace(c.Query("q"))
 
 	if c.Query("lat") == "" && c.Query("lng") == "" {
-		listings, err := h.service.ListRecent(c.Request.Context())
+
+		listings, err := h.service.ListRecent(c.Request.Context(), search)
 
 		if err != nil {
 			log.Println("list recent listings:", err)
@@ -186,7 +189,7 @@ func (h *Handler) ListNearby(c *gin.Context) {
 		return
 	}
 
-	listings, err := h.service.ListNearby(c.Request.Context(), lat, lng)
+	listings, err := h.service.ListNearby(c.Request.Context(), lat, lng, search)
 	if err != nil {
 		if errors.Is(err, ErrInvalidLocation) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
