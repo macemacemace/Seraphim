@@ -175,14 +175,26 @@ WHERE ST_DWithin(
         OR title ILIKE '%' || $3 || '%'
         OR description ILIKE '%' || $3 || '%'
     )
+    AND (
+        $4::text = ''
+        OR type = $4
+    )
+    AND price >= $5::int
+    AND (
+        $6::int = -1
+        OR price <= $6
+    )
 ORDER BY listings.created_at DESC
 LIMIT 50
 `
 
 type ListNearbyListingsParams struct {
-	Lng    float64
-	Lat    float64
-	Search string
+	Lng         float64
+	Lat         float64
+	Search      string
+	ListingType string
+	MinPrice    int32
+	MaxPrice    int32
 }
 
 type ListNearbyListingsRow struct {
@@ -201,7 +213,14 @@ type ListNearbyListingsRow struct {
 }
 
 func (q *Queries) ListNearbyListings(ctx context.Context, arg ListNearbyListingsParams) ([]ListNearbyListingsRow, error) {
-	rows, err := q.db.Query(ctx, listNearbyListings, arg.Lng, arg.Lat, arg.Search)
+	rows, err := q.db.Query(ctx, listNearbyListings,
+		arg.Lng,
+		arg.Lat,
+		arg.Search,
+		arg.ListingType,
+		arg.MinPrice,
+		arg.MaxPrice,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -261,9 +280,25 @@ WHERE status = 'ACTIVE'
         OR title ILIKE '%' || $1 || '%'
         OR description ILIKE '%' || $1 || '%'
     )
+    AND (
+        $2::text = ''
+        OR type = $2
+    )
+    AND price >= $3::int
+    AND (
+        $4::int = -1
+        OR price <= $4
+    )
 ORDER BY listings.created_at DESC
 LIMIT 50
 `
+
+type ListRecentListingsParams struct {
+	Search      string
+	ListingType string
+	MinPrice    int32
+	MaxPrice    int32
+}
 
 type ListRecentListingsRow struct {
 	ID          uuid.UUID
@@ -280,8 +315,13 @@ type ListRecentListingsRow struct {
 	CoverUrl    string
 }
 
-func (q *Queries) ListRecentListings(ctx context.Context, search string) ([]ListRecentListingsRow, error) {
-	rows, err := q.db.Query(ctx, listRecentListings, search)
+func (q *Queries) ListRecentListings(ctx context.Context, arg ListRecentListingsParams) ([]ListRecentListingsRow, error) {
+	rows, err := q.db.Query(ctx, listRecentListings,
+		arg.Search,
+		arg.ListingType,
+		arg.MinPrice,
+		arg.MaxPrice,
+	)
 	if err != nil {
 		return nil, err
 	}

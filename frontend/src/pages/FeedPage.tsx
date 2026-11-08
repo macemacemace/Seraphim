@@ -72,7 +72,7 @@ export default function FeedPage() {
         </div>
       )}
 
-      {!loading && listings.length === 0 && (
+      {!loading && listings.length === 0 && q === "" && (
         <p className="feed-message">
           No listings nearby yet. Be the first to sell something!
         </p>

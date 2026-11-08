@@ -145,13 +145,45 @@ func (h *Handler) Get(c *gin.Context) {
 	})
 
 }
+func parseFeedFilters(c *gin.Context) (FeedFilters, error) {
+	filters := FeedFilters{
+		Search:      strings.TrimSpace(c.Query("q")),
+		ListingType: c.Query("type"),
+		MinPrice:    0,
+		MaxPrice:    -1,
+	}
+	if filters.ListingType != "" && filters.ListingType != "ITEM" && filters.ListingType != "SERVICE" {
+		return filters, ErrInvalidType
+	}
+	if c.Query("minPrice") != "" {
+		minPrice, err := strconv.ParseInt(c.Query("minPrice"), 10, 32)
+		if err != nil || minPrice < 0 {
+			return filters, ErrInvalidPrice
+		}
+		filters.MinPrice = int32(minPrice)
+	}
+
+	if c.Query("maxPrice") != "" {
+		maxPrice, err := strconv.ParseInt(c.Query("maxPrice"), 10, 32)
+		if err != nil || maxPrice < 0 {
+			return filters, ErrInvalidPrice
+		}
+		filters.MaxPrice = int32(maxPrice)
+
+	}
+	return filters, nil
+}
 
 func (h *Handler) ListNearby(c *gin.Context) {
-	search := strings.TrimSpace(c.Query("q"))
+	filters, err := parseFeedFilters(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	if c.Query("lat") == "" && c.Query("lng") == "" {
 
-		listings, err := h.service.ListRecent(c.Request.Context(), search)
+		listings, err := h.service.ListRecent(c.Request.Context(), filters)
 
 		if err != nil {
 			log.Println("list recent listings:", err)
@@ -189,7 +221,7 @@ func (h *Handler) ListNearby(c *gin.Context) {
 		return
 	}
 
-	listings, err := h.service.ListNearby(c.Request.Context(), lat, lng, search)
+	listings, err := h.service.ListNearby(c.Request.Context(), lat, lng, filters)
 	if err != nil {
 		if errors.Is(err, ErrInvalidLocation) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

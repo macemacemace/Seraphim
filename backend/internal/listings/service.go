@@ -27,7 +27,7 @@ type listingStore interface {
 	CreateListing(ctx context.Context, arg db.CreateListingParams) (db.CreateListingRow, error)
 	GetListing(ctx context.Context, id uuid.UUID) (db.GetListingRow, error)
 	ListNearbyListings(ctx context.Context, arg db.ListNearbyListingsParams) ([]db.ListNearbyListingsRow, error)
-	ListRecentListings(ctx context.Context, search string) ([]db.ListRecentListingsRow, error)
+	ListRecentListings(ctx context.Context, arg db.ListRecentListingsParams) ([]db.ListRecentListingsRow, error)
 	CreateListingPhoto(ctx context.Context, arg db.CreateListingPhotoParams) (db.ListingPhoto, error)
 	ListListingPhotos(ctx context.Context, listingID uuid.UUID) ([]db.ListingPhoto, error)
 }
@@ -54,6 +54,13 @@ type CreateInput struct {
 	Price       int32
 	Lat         float64
 	Lng         float64
+}
+
+type FeedFilters struct {
+	Search      string
+	ListingType string
+	MinPrice    int32
+	MaxPrice    int32
 }
 
 func (s *Service) Create(ctx context.Context, input CreateInput) (db.CreateListingRow, error) {
@@ -108,15 +115,18 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID) (db.GetListingRow, erro
 
 }
 
-func (s *Service) ListNearby(ctx context.Context, lat, lng float64, search string) ([]db.ListNearbyListingsRow, error) {
+func (s *Service) ListNearby(ctx context.Context, lat, lng float64, filters FeedFilters) ([]db.ListNearbyListingsRow, error) {
 	if lat < -90 || lat > 90 || lng < -180 || lng > 180 {
 		return nil, ErrInvalidLocation
 	}
 
 	listings, err := s.store.ListNearbyListings(ctx, db.ListNearbyListingsParams{
-		Lat:    lat,
-		Lng:    lng,
-		Search: search,
+		Lat:         lat,
+		Lng:         lng,
+		Search:      filters.Search,
+		ListingType: filters.ListingType,
+		MinPrice:    filters.MinPrice,
+		MaxPrice:    filters.MaxPrice,
 	})
 
 	if err != nil {
@@ -127,9 +137,14 @@ func (s *Service) ListNearby(ctx context.Context, lat, lng float64, search strin
 
 }
 
-func (s *Service) ListRecent(ctx context.Context, search string) ([]db.ListRecentListingsRow, error) {
+func (s *Service) ListRecent(ctx context.Context, filters FeedFilters) ([]db.ListRecentListingsRow, error) {
 
-	listings, err := s.store.ListRecentListings(ctx, search)
+	listings, err := s.store.ListRecentListings(ctx, db.ListRecentListingsParams{
+		Search:      filters.Search,
+		ListingType: filters.ListingType,
+		MinPrice:    filters.MinPrice,
+		MaxPrice:    filters.MaxPrice,
+	})
 
 	if err != nil {
 		return nil, fmt.Errorf("list recent listings: %w", err)

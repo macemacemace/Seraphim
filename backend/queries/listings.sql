@@ -73,6 +73,15 @@ WHERE ST_DWithin(
         OR title ILIKE '%' || @search || '%'
         OR description ILIKE '%' || @search || '%'
     )
+    AND (
+        @listing_type::text = ''
+        OR type = @listing_type
+    )
+    AND price >= @min_price::int
+    AND (
+        @max_price::int = -1
+        OR price <= @max_price
+    )
 ORDER BY listings.created_at DESC
 LIMIT 50;
 -- name: ListRecentListings :many
@@ -102,6 +111,15 @@ WHERE status = 'ACTIVE'
         @search::text = ''
         OR title ILIKE '%' || @search || '%'
         OR description ILIKE '%' || @search || '%'
+    )
+    AND (
+        @listing_type::text = ''
+        OR type = @listing_type
+    )
+    AND price >= @min_price::int
+    AND (
+        @max_price::int = -1
+        OR price <= @max_price
     )
 ORDER BY listings.created_at DESC
 LIMIT 50;
