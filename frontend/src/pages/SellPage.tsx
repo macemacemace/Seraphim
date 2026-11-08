@@ -149,19 +149,22 @@ export default function SellPage() {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         ></textarea>
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          multiple
-          onChange={(e) => {
-            if (e.target.files) {
-              const picked = Array.from(e.target.files);
+        <label className="photo-picker">
+          <span>Add photos ({photos.length})</span>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            onChange={(e) => {
+              if (e.target.files) {
+                const picked = Array.from(e.target.files);
 
-              setPhotos([...photos, ...picked]);
-            }
-            e.target.value = "";
-          }}
-        />
+                setPhotos([...photos, ...picked]);
+              }
+              e.target.value = "";
+            }}
+          />
+        </label>
 
         {photos.length > 0 && (
           <ul className="photo-list">
