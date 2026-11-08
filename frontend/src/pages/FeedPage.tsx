@@ -59,10 +59,23 @@ export default function FeedPage() {
             to={`/listings/${listing.id}`}
             className="card-link"
           >
-            <article key={listing.id} className="listing-card">
+            <article className="listing-card">
+              {listing.coverUrl && (
+                <img
+                  className="card-photo"
+                  src={listing.coverUrl}
+                  alt={listing.title}
+                />
+              )}
+              {!listing.coverUrl && (
+                <div className="card-photo card-placeholder">
+                  {listing.type === "ITEM" && "📦"}
+                  {listing.type === "SERVICE" && "🛠️"}
+                </div>
+              )}
               <h2>{listing.title}</h2>
               <p className="listing-price">
-                {listing.price == 0 && "Free"}
+                {listing.price === 0 && "Free"}
                 {listing.price > 0 && `${listing.price} den`}
               </p>
               <p className="listing-type">{listing.type}</p>

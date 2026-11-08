@@ -305,3 +305,19 @@ img.listing-photo {
   height: 100%;
   object-fit: cover;  
 }
+.card-photo{
+  width: 100%;
+  aspect-ratio:4/3 ;       
+  object-fit: cover;         
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.card-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  background: var(--bg);
+}

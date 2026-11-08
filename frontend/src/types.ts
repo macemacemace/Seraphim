@@ -17,4 +17,5 @@ export type Listing = {
   lat: number;
   lng: number;
   photos?: Photo[];
+  coverUrl?: string;
 };
