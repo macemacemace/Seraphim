@@ -77,11 +77,7 @@ export default function FeedPage() {
           No listings nearby yet. Be the first to sell something!
         </p>
       )}
-      {!loading && listings.length === 0 && q === "" && (
-        <p className="feed-message">
-          No listings nearby yet. Be the first to sell something!
-        </p>
-      )}
+
       {!loading && listings.length === 0 && q !== "" && (
         <p className="feed-message">No listings match "{q}"</p>
       )}
