@@ -184,7 +184,16 @@ WHERE ST_DWithin(
         $6::int = -1
         OR price <= $6
     )
-ORDER BY listings.created_at DESC
+ORDER BY CASE
+        WHEN $7::text = 'price_asc' THEN price
+    END ASC,
+    CASE
+        WHEN $7::text = 'price_desc' THEN price
+    END DESC,
+    CASE
+        WHEN $7::text = 'oldest' THEN listings.created_at
+    END ASC,
+    listings.created_at DESC
 LIMIT 50
 `
 
@@ -195,6 +204,7 @@ type ListNearbyListingsParams struct {
 	ListingType string
 	MinPrice    int32
 	MaxPrice    int32
+	Sort        string
 }
 
 type ListNearbyListingsRow struct {
@@ -220,6 +230,7 @@ func (q *Queries) ListNearbyListings(ctx context.Context, arg ListNearbyListings
 		arg.ListingType,
 		arg.MinPrice,
 		arg.MaxPrice,
+		arg.Sort,
 	)
 	if err != nil {
 		return nil, err
@@ -289,7 +300,16 @@ WHERE status = 'ACTIVE'
         $4::int = -1
         OR price <= $4
     )
-ORDER BY listings.created_at DESC
+ORDER BY CASE
+        WHEN $5::text = 'price_asc' THEN price
+    END ASC,
+    CASE
+        WHEN $5::text = 'price_desc' THEN price
+    END DESC,
+    CASE
+        WHEN $5::text = 'oldest' THEN listings.created_at
+    END ASC,
+    listings.created_at DESC
 LIMIT 50
 `
 
@@ -298,6 +318,7 @@ type ListRecentListingsParams struct {
 	ListingType string
 	MinPrice    int32
 	MaxPrice    int32
+	Sort        string
 }
 
 type ListRecentListingsRow struct {
@@ -321,6 +342,7 @@ func (q *Queries) ListRecentListings(ctx context.Context, arg ListRecentListings
 		arg.ListingType,
 		arg.MinPrice,
 		arg.MaxPrice,
+		arg.Sort,
 	)
 	if err != nil {
 		return nil, err

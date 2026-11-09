@@ -82,7 +82,16 @@ WHERE ST_DWithin(
         @max_price::int = -1
         OR price <= @max_price
     )
-ORDER BY listings.created_at DESC
+ORDER BY CASE
+        WHEN @sort::text = 'price_asc' THEN price
+    END ASC,
+    CASE
+        WHEN @sort::text = 'price_desc' THEN price
+    END DESC,
+    CASE
+        WHEN @sort::text = 'oldest' THEN listings.created_at
+    END ASC,
+    listings.created_at DESC
 LIMIT 50;
 -- name: ListRecentListings :many
 SELECT id,
@@ -121,5 +130,14 @@ WHERE status = 'ACTIVE'
         @max_price::int = -1
         OR price <= @max_price
     )
-ORDER BY listings.created_at DESC
+ORDER BY CASE
+        WHEN @sort::text = 'price_asc' THEN price
+    END ASC,
+    CASE
+        WHEN @sort::text = 'price_desc' THEN price
+    END DESC,
+    CASE
+        WHEN @sort::text = 'oldest' THEN listings.created_at
+    END ASC,
+    listings.created_at DESC
 LIMIT 50;
