@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"io"
 
@@ -45,6 +46,7 @@ type createListingResponse struct {
 	Price       int32     `json:"price"`
 	Lat         float64   `json:"lat"`
 	Lng         float64   `json:"lng"`
+	CreatedAt   time.Time `json:"createdAt"`
 }
 
 func NewHandler(service *Service) *Handler {
@@ -88,6 +90,7 @@ func (h *Handler) Create(c *gin.Context) {
 		Price:       listing.Price,
 		Lat:         listing.Lat,
 		Lng:         listing.Lng,
+		CreatedAt:   listing.CreatedAt,
 	})
 
 }
@@ -140,6 +143,7 @@ func (h *Handler) Get(c *gin.Context) {
 			Price:       listing.Price,
 			Lat:         listing.Lat,
 			Lng:         listing.Lng,
+			CreatedAt:   listing.CreatedAt,
 		},
 		Photos: photoList,
 	})
@@ -202,6 +206,7 @@ func (h *Handler) ListNearby(c *gin.Context) {
 					Price:       l.Price,
 					Lat:         l.Lat,
 					Lng:         l.Lng,
+					CreatedAt:   l.CreatedAt,
 				},
 				CoverURL: l.CoverUrl,
 			})
@@ -244,6 +249,7 @@ func (h *Handler) ListNearby(c *gin.Context) {
 				Price:       l.Price,
 				Lat:         l.Lat,
 				Lng:         l.Lng,
+				CreatedAt:   l.CreatedAt,
 			},
 			CoverURL: l.CoverUrl,
 		})
