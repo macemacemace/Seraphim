@@ -8,20 +8,27 @@ export default function FeedPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const q = searchParams.get("q") || "";
+  const type = searchParams.get("type") || "";
   const [text, setText] = useState(q);
+
+  const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
+  const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
 
   const query = searchParams.toString();
 
   function handleSearch(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
+    const next = new URLSearchParams(searchParams);
     const trimmer = text.trim();
+
     if (trimmer === "") {
-      setSearchParams({});
-      return;
+      next.delete("q");
+    } else {
+      next.set("q", trimmer);
     }
 
-    setSearchParams({ q: trimmer });
+    setSearchParams(next);
   }
 
   useEffect(() => {
@@ -51,6 +58,44 @@ export default function FeedPage() {
     );
   }, [query]);
 
+  function changeType(value: string) {
+    const next = new URLSearchParams(searchParams);
+
+    if (value === "") {
+      next.delete("type");
+    } else {
+      next.set("type", value);
+    }
+    setSearchParams(next);
+  }
+
+  function typeClass(value: string) {
+    if (value === type) {
+      return "filter-option selected";
+    }
+    return "filter-option";
+  }
+
+  function handlePrice(e: React.SubmitEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const next = new URLSearchParams(searchParams);
+
+    if (minPrice === "") {
+      next.delete("minPrice");
+    } else {
+      next.set("minPrice", minPrice);
+    }
+
+    if (maxPrice === "") {
+      next.delete("maxPrice");
+    } else {
+      next.set("maxPrice", maxPrice);
+    }
+
+    setSearchParams(next);
+  }
+
   return (
     <main>
       <div className="feed-header">
@@ -68,6 +113,49 @@ export default function FeedPage() {
           Sell something
         </Link>
       </div>
+      <div className="filter-row">
+        <button
+          type="button"
+          className={typeClass("")}
+          onClick={() => changeType("")}
+        >
+          All
+        </button>
+        <button
+          type="button"
+          className={typeClass("ITEM")}
+          onClick={() => changeType("")}
+        >
+          Item
+        </button>
+        <button
+          type="button"
+          className={typeClass("SERVICE")}
+          onClick={() => changeType("")}
+        >
+          Service
+        </button>
+      </div>
+      <form className="price-filter" onSubmit={handlePrice}>
+        <input
+          type="number"
+          min="0"
+          placeholder="Min price"
+          aria-label="Minimum price"
+          value={minPrice}
+          onChange={(e) => setMinPrice(e.target.value)}
+        />
+        <input
+          type="number"
+          min="0"
+          placeholder="Max price"
+          aria-label="Maximum price"
+          value={maxPrice}
+          onChange={(e) => setMaxPrice(e.target.value)}
+        />
+
+        <button type="submit">Apply</button>
+      </form>
       {loading && (
         <div className="feed-loading">
           <div className="dots">
