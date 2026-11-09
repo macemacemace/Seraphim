@@ -18,4 +18,5 @@ export type Listing = {
   lng: number;
   photos?: Photo[];
   coverUrl?: string;
+  createdAt: string;
 };

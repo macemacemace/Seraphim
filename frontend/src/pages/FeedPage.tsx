@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import type { Listing } from "../types";
+import { timeAgo } from "../timeAgo";
 
 export default function FeedPage() {
   const [listings, setListings] = useState<Listing[]>([]);
@@ -203,6 +204,7 @@ export default function FeedPage() {
                 {listing.price > 0 && `${listing.price} den`}
               </p>
               <p className="listing-type">{listing.type}</p>
+              <p className="listing-date">{timeAgo(listing.createdAt)}</p>
             </article>
           </Link>
         ))}

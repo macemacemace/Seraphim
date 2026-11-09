@@ -65,6 +65,12 @@ export default function ListingPage() {
     }
   }
 
+  const listedDate = new Date(listing.createdAt).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
   return (
     <main className="listing-page">
       <Link to="/" className="back-link">
@@ -132,6 +138,7 @@ export default function ListingPage() {
       </p>
       <p className="listing-type">{listing.type}</p>
       <p className="listing-description">{listing.description}</p>
+      <p className="listing-date">Listed on {listedDate}</p>
     </main>
   );
 }

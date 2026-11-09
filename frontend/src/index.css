@@ -394,3 +394,10 @@ img.listing-photo {
   background: var(--card);
   color: var(--text);
 }
+
+
+.listing-date{
+  color: var(--muted);
+  font-size: 14px;
+
+}
