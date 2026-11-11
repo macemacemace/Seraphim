@@ -21,6 +21,7 @@ var (
 	ErrInvalidLocation = errors.New("invalid location")
 	ErrNotYourListing  = errors.New("you can only add photos to your own listings")
 	ErrTooManyPhotos   = errors.New("a listing can have at most 5 photos")
+	ErrInvalidSort     = errors.New("Sort must be older, price_asc or price_desc")
 )
 
 type listingStore interface {
@@ -61,6 +62,7 @@ type FeedFilters struct {
 	ListingType string
 	MinPrice    int32
 	MaxPrice    int32
+	Sort        string
 }
 
 func (s *Service) Create(ctx context.Context, input CreateInput) (db.CreateListingRow, error) {
@@ -127,6 +129,7 @@ func (s *Service) ListNearby(ctx context.Context, lat, lng float64, filters Feed
 		ListingType: filters.ListingType,
 		MinPrice:    filters.MinPrice,
 		MaxPrice:    filters.MaxPrice,
+		Sort:        filters.Sort,
 	})
 
 	if err != nil {
@@ -144,6 +147,7 @@ func (s *Service) ListRecent(ctx context.Context, filters FeedFilters) ([]db.Lis
 		ListingType: filters.ListingType,
 		MinPrice:    filters.MinPrice,
 		MaxPrice:    filters.MaxPrice,
+		Sort:        filters.Sort,
 	})
 
 	if err != nil {

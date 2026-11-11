@@ -155,6 +155,10 @@ func parseFeedFilters(c *gin.Context) (FeedFilters, error) {
 		ListingType: c.Query("type"),
 		MinPrice:    0,
 		MaxPrice:    -1,
+		Sort:        c.Query("sort"),
+	}
+	if filters.Sort != "" && filters.Sort != "oldest" && filters.Sort != "price_asc" && filters.Sort != "price_desc" {
+		return filters, ErrInvalidSort
 	}
 	if filters.ListingType != "" && filters.ListingType != "ITEM" && filters.ListingType != "SERVICE" {
 		return filters, ErrInvalidType
