@@ -17,6 +17,8 @@ export default function FeedPage() {
 
   const query = searchParams.toString();
 
+  const sort = searchParams.get("sort") || "";
+
   function handleSearch(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -75,6 +77,18 @@ export default function FeedPage() {
       return "filter-option selected";
     }
     return "filter-option";
+  }
+
+  function changeSort(value: string) {
+    const next = new URLSearchParams(searchParams);
+
+    if (value === "") {
+      next.delete("sort");
+    } else {
+      next.set("sort", value);
+    }
+
+    setSearchParams(next);
   }
 
   function handlePrice(e: React.SubmitEvent<HTMLFormElement>) {
@@ -146,6 +160,7 @@ export default function FeedPage() {
           value={minPrice}
           onChange={(e) => setMinPrice(e.target.value)}
         />
+
         <input
           type="number"
           min="0"
@@ -157,6 +172,17 @@ export default function FeedPage() {
 
         <button type="submit">Apply</button>
       </form>
+
+      <select
+        aria-label="Sort listings"
+        value={sort}
+        onChange={(e) => changeSort(e.target.value)}
+      >
+        <option value="">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="price_desc">Price: high to low</option>
+        <option value="price_asc">Price: low to high</option>
+      </select>
       {loading && (
         <div className="feed-loading">
           <div className="dots">
