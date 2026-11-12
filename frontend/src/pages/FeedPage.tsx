@@ -147,14 +147,16 @@ export default function FeedPage() {
             onChange={(e) => setText(e.target.value)}
           />
         </form>
-        {user && (
-          <Link to="/me" className="avatar" aria-label="My profile">
-            {user.name[0].toUpperCase()}
+        <div className="header-actions">
+          <Link to="/sell" className="sell-button">
+            Sell something
           </Link>
-        )}
-        <Link to="/sell" className="sell-button">
-          Sell something
-        </Link>
+          {user && (
+            <Link to="/me" className="avatar" aria-label="My profile">
+              {user.name[0].toUpperCase()}
+            </Link>
+          )}
+        </div>
       </div>
       <div className="filters-sorts">
         <div className="filter-row">
