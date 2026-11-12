@@ -7,6 +7,7 @@ import RegisterPage from "./pages/RegisterPage.tsx";
 import FeedPage from "./pages/FeedPage.tsx";
 import SellPage from "./pages/SellPage.tsx";
 import ListingPage from "./pages/ListingPage.tsx";
+import ProfilePage from "./pages/ProfilePage.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -17,6 +18,7 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/" element={<FeedPage />} />
         <Route path="/sell" element={<SellPage />} />
         <Route path="/listings/:id" element={<ListingPage />} />
+        <Route path="/me" element={<ProfilePage />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
