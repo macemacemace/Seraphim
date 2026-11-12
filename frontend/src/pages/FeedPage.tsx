@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
-import type { Listing } from "../types";
+import type { Listing, User } from "../types";
 import { timeAgo } from "../timeAgo";
 
 export default function FeedPage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [user, setUser] = useState<User | null>(null);
 
   const q = searchParams.get("q") || "";
   const type = searchParams.get("type") || "";
@@ -60,6 +61,28 @@ export default function FeedPage() {
       },
     );
   }, [query]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return;
+    }
+
+    fetch("/api/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return null;
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (data) {
+          setUser(data);
+        }
+      });
+  }, []);
 
   function changeType(value: string) {
     const next = new URLSearchParams(searchParams);
@@ -124,6 +147,11 @@ export default function FeedPage() {
             onChange={(e) => setText(e.target.value)}
           />
         </form>
+        {user && (
+          <Link to="/me" className="avatar" aria-label="My profile">
+            {user.name[0].toUpperCase()}
+          </Link>
+        )}
         <Link to="/sell" className="sell-button">
           Sell something
         </Link>
@@ -153,11 +181,7 @@ export default function FeedPage() {
           </button>
         </div>
 
-        <form
-          id="price-form"
-          className="price-filter"
-          onSubmit={handlePrice}
-        >
+        <form id="price-form" className="price-filter" onSubmit={handlePrice}>
           <input
             type="number"
             min="0"

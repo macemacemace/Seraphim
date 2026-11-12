@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 type registerRequest struct {
@@ -93,5 +94,22 @@ func (h *Handler) Login(c *gin.Context) {
 
 func (h *Handler) Me(c *gin.Context) {
 	userID := c.MustGet("userID").(uuid.UUID)
-	c.JSON(http.StatusOK, gin.H{"userID": userID})
+
+	user, err := h.service.GetUser(c.Request.Context(), userID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+			return
+		}
+
+		log.Println("get user:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"id":    user.ID,
+		"name":  user.Name,
+		"email": user.Email,
+	})
 }

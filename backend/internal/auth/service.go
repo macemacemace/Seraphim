@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/google/uuid"
+
 	"net/mail"
 	"strings"
 
@@ -25,6 +27,7 @@ var (
 type userStore interface {
 	CreateUser(ctx context.Context, arg db.CreateUserParams) (db.User, error)
 	GetUserByEmail(ctx context.Context, email string) (db.User, error)
+	GetUserByID(ctx context.Context, id uuid.UUID) (db.User, error)
 }
 
 func NewService(store userStore, secret []byte) *Service {
@@ -93,6 +96,14 @@ func (s *Service) Login(ctx context.Context, email, password string) (string, er
 	}
 
 	return newAccessToken(user.ID, s.secret)
+}
+
+func (s *Service) GetUser(ctx context.Context, id uuid.UUID) (db.User, error) {
+	user, err := s.store.GetUserByID(ctx, id)
+	if err != nil {
+		return db.User{}, fmt.Errorf("get user: %w", err)
+	}
+	return user, nil
 }
 
 type Service struct {
