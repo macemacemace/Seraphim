@@ -194,11 +194,6 @@ width: 100%;
   font-weight: 500;
 }
 
-.feed-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
 .sell-button {
   background: var(--accent);
@@ -379,10 +374,7 @@ img.listing-photo {
 }
 
 
-.search-form {
-  flex: 1;
-  margin: 0 16px;
-}
+
 
 .search-form input {
   width: 100%;
@@ -400,4 +392,107 @@ img.listing-photo {
   color: var(--muted);
   font-size: 14px;
 
+}
+
+
+.filter-option{
+
+  padding: 8px 16px;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.filter-option.selected{
+  background: var(--bg);
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.filters-sorts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  justify-content: center;
+  
+}
+
+.filter-row{
+  display: flex;
+  gap: 8px;
+}
+
+.price-filter {
+  display: flex;
+  gap: 8px;
+
+}
+
+.price-filter input{
+  width: 110px;
+}
+
+.price-filter input,
+.filters-sorts select {
+  padding: 8px 12px;
+  font-size: 16px;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+}
+
+.price-filter button {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-family: inherit;
+  border: none;
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.apply-button{
+  padding: 8px 16px;
+  font-size: 16px;
+  font-family: inherit;
+  border: 2px solid var(--on-accent);
+  background: var(--accent);
+  border-radius: 12px;
+  color: var(--bg);
+  cursor: pointer;
+}
+
+.feed-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.search-form {
+  order: 3;
+  flex-basis: 100%;
+}
+
+@media (min-width: 768px) {
+  .search-form {
+    order: 0;
+    flex-basis: auto;
+    flex: 1;
+    margin: 0 16px;
+  }
+
+  .filters-sorts {
+    justify-content: flex-start;
+  }
 }

@@ -128,61 +128,70 @@ export default function FeedPage() {
           Sell something
         </Link>
       </div>
-      <div className="filter-row">
-        <button
-          type="button"
-          className={typeClass("")}
-          onClick={() => changeType("")}
+      <div className="filters-sorts">
+        <div className="filter-row">
+          <button
+            type="button"
+            className={typeClass("")}
+            onClick={() => changeType("")}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            className={typeClass("ITEM")}
+            onClick={() => changeType("ITEM")}
+          >
+            Item
+          </button>
+          <button
+            type="button"
+            className={typeClass("SERVICE")}
+            onClick={() => changeType("SERVICE")}
+          >
+            Service
+          </button>
+        </div>
+
+        <form
+          id="price-form"
+          className="price-filter"
+          onSubmit={handlePrice}
         >
-          All
-        </button>
-        <button
-          type="button"
-          className={typeClass("ITEM")}
-          onClick={() => changeType("")}
+          <input
+            type="number"
+            min="0"
+            placeholder="Min price"
+            aria-label="Minimum price"
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+          />
+
+          <input
+            type="number"
+            min="0"
+            placeholder="Max price"
+            aria-label="Maximum price"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+          />
+        </form>
+
+        <select
+          aria-label="Sort listings"
+          value={sort}
+          onChange={(e) => changeSort(e.target.value)}
         >
-          Item
-        </button>
-        <button
-          type="button"
-          className={typeClass("SERVICE")}
-          onClick={() => changeType("")}
-        >
-          Service
+          <option value="">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="price_desc">Price: high to low</option>
+          <option value="price_asc">Price: low to high</option>
+        </select>
+
+        <button className="apply-button" type="submit" form="price-form">
+          Apply
         </button>
       </div>
-      <form className="price-filter" onSubmit={handlePrice}>
-        <input
-          type="number"
-          min="0"
-          placeholder="Min price"
-          aria-label="Minimum price"
-          value={minPrice}
-          onChange={(e) => setMinPrice(e.target.value)}
-        />
-
-        <input
-          type="number"
-          min="0"
-          placeholder="Max price"
-          aria-label="Maximum price"
-          value={maxPrice}
-          onChange={(e) => setMaxPrice(e.target.value)}
-        />
-
-        <button type="submit">Apply</button>
-      </form>
-
-      <select
-        aria-label="Sort listings"
-        value={sort}
-        onChange={(e) => changeSort(e.target.value)}
-      >
-        <option value="">Newest first</option>
-        <option value="oldest">Oldest first</option>
-        <option value="price_desc">Price: high to low</option>
-        <option value="price_asc">Price: low to high</option>
-      </select>
       {loading && (
         <div className="feed-loading">
           <div className="dots">
