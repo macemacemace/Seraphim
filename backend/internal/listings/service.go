@@ -21,7 +21,7 @@ var (
 	ErrInvalidLocation = errors.New("invalid location")
 	ErrNotYourListing  = errors.New("you can only add photos to your own listings")
 	ErrTooManyPhotos   = errors.New("a listing can have at most 5 photos")
-	ErrInvalidSort     = errors.New("Sort must be oldest, price_asc or price_desc")
+	ErrInvalidSort     = errors.New("sort must be oldest, price_asc or price_desc")
 )
 
 type listingStore interface {
