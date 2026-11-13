@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import type { User } from "../types";
+import type { Listing, User } from "../types";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
+  const [listings, setListings] = useState<Listing[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,6 +29,17 @@ export default function ProfilePage() {
           setUser(data);
         }
       });
+
+    fetch("/api/me/listings", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return [];
+        }
+        return res.json();
+      })
+      .then((data: Listing[]) => setListings(data));
   }, [navigate]);
 
   function handleLogout() {
@@ -52,6 +64,12 @@ export default function ProfilePage() {
       <button type="button" className="logout-button" onClick={handleLogout}>
         Log out
       </button>
+
+      <h2 className="my-listings-title">My listings</h2>
+
+      {listings.length === 0 && (
+        <p className="feed-message">You haven't posted anything yet.</p>
+      )}
     </main>
   );
 }

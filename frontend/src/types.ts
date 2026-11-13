@@ -19,6 +19,7 @@ export type Listing = {
   photos?: Photo[];
   coverUrl?: string;
   createdAt: string;
+  status?: string;
 };
 
 export type User = {
