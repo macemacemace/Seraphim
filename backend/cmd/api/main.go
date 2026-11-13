@@ -90,6 +90,9 @@ func main() {
 
 	api.POST("/listings/:id/photos", auth.RequireAuth([]byte(jwtSecret)), listingsHandler.AddPhoto)
 
+	api.GET("/me/listings", auth.RequireAuth([]byte(jwtSecret)),
+		listingsHandler.Mine)
+
 	api.GET("/listings", listingsHandler.ListNearby)
 	api.GET("/health", func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)

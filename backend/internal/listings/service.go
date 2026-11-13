@@ -31,6 +31,7 @@ type listingStore interface {
 	ListRecentListings(ctx context.Context, arg db.ListRecentListingsParams) ([]db.ListRecentListingsRow, error)
 	CreateListingPhoto(ctx context.Context, arg db.CreateListingPhotoParams) (db.ListingPhoto, error)
 	ListListingPhotos(ctx context.Context, listingID uuid.UUID) ([]db.ListingPhoto, error)
+	ListListingsBySeller(ctx context.Context, sellerID uuid.UUID) ([]db.ListListingsBySellerRow, error)
 }
 
 type photoUploader interface {
@@ -156,6 +157,16 @@ func (s *Service) ListRecent(ctx context.Context, filters FeedFilters) ([]db.Lis
 
 	return listings, nil
 
+}
+
+func (s *Service) ListBySeller(ctx context.Context, sellerID uuid.UUID) ([]db.ListListingsBySellerRow, error) {
+	listings, err := s.store.ListListingsBySeller(ctx, sellerID)
+
+	if err != nil {
+		return nil, fmt.Errorf("list listings by seller: %w", err)
+	}
+
+	return listings, nil
 }
 
 func (s *Service) AddPhoto(ctx context.Context, listingID, sellerID uuid.UUID, file io.Reader) (db.ListingPhoto, error) {

@@ -149,6 +149,46 @@ func (h *Handler) Get(c *gin.Context) {
 	})
 
 }
+
+type myListingResponse struct {
+	feedListingResponse
+	Status string `json:"status"`
+}
+
+func (h *Handler) Mine(c *gin.Context) {
+	sellerID := c.MustGet("userID").(uuid.UUID)
+
+	listings, err := h.service.ListBySeller(c.Request.Context(), sellerID)
+	if err != nil {
+		log.Println("list my listings:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+		return
+	}
+
+	response := make([]myListingResponse, 0, len(listings))
+	for _, l := range listings {
+		response = append(response, myListingResponse{
+			feedListingResponse: feedListingResponse{
+				createListingResponse: createListingResponse{
+					ID:          l.ID,
+					SellerID:    l.SellerID,
+					Type:        l.Type,
+					Title:       l.Title,
+					Description: l.Description,
+					Price:       l.Price,
+					Lat:         l.Lat,
+					Lng:         l.Lng,
+					CreatedAt:   l.CreatedAt,
+				},
+				CoverURL: l.CoverUrl,
+			},
+			Status: l.Status,
+		})
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
 func parseFeedFilters(c *gin.Context) (FeedFilters, error) {
 	filters := FeedFilters{
 		Search:      strings.TrimSpace(c.Query("q")),
