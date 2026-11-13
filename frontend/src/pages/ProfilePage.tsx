@@ -30,6 +30,11 @@ export default function ProfilePage() {
       });
   }, [navigate]);
 
+  function handleLogout() {
+    localStorage.removeItem("token");
+    navigate("/");
+  }
+
   if (user === null) {
     return (
       <main>
@@ -43,6 +48,10 @@ export default function ProfilePage() {
       <div className="avatar profile-avatar">{user.name[0].toUpperCase()}</div>
       <h1>{user.name}</h1>
       <p className="profile-email">{user.email}</p>
+
+      <button type="button" className="logout-button" onClick={handleLogout}>
+        Log out
+      </button>
     </main>
   );
 }
