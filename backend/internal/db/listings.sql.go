@@ -158,7 +158,7 @@ SELECT id,
         (
             SELECT url
             FROM listing_photos
-            WHERE listing_photos.listing_id = listing_id
+            WHERE listing_photos.listing_id = listings.id
             ORDER BY position
             LIMIT 1
         ), ''

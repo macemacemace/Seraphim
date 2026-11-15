@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import type { Listing, User } from "../types";
+import ListingCard from "../components/ListingCard";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
@@ -56,20 +57,30 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="profile-page">
-      <div className="avatar profile-avatar">{user.name[0].toUpperCase()}</div>
-      <h1>{user.name}</h1>
-      <p className="profile-email">{user.email}</p>
+    <main>
+      <section className="profile-page">
+        <div className="avatar profile-avatar">
+          {user.name[0].toUpperCase()}
+        </div>
+        <h1>{user.name}</h1>
+        <p className="profile-email">{user.email}</p>
 
-      <button type="button" className="logout-button" onClick={handleLogout}>
-        Log out
-      </button>
+        <button type="button" className="logout-button" onClick={handleLogout}>
+          Log out
+        </button>
+      </section>
 
       <h2 className="my-listings-title">My listings</h2>
 
       {listings.length === 0 && (
         <p className="feed-message">You haven't posted anything yet.</p>
       )}
+
+      <div className="feed-grid">
+        {listings.map((listing) => (
+          <ListingCard key={listing.id} listing={listing} />
+        ))}
+      </div>
     </main>
   );
 }
