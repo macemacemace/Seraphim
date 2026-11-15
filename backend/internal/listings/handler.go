@@ -24,6 +24,10 @@ type photoResponse struct {
 	Position int32     `json:"position"`
 }
 
+type updateStatusRequest struct {
+	Status string `json:"status"`
+}
+
 type listingDetailResponse struct {
 	createListingResponse
 	Photos []photoResponse `json:"photos"`
@@ -380,4 +384,41 @@ func (h *Handler) AddPhoto(c *gin.Context) {
 		Position: photo.Position,
 	})
 
+}
+
+func (h *Handler) UpdateStatus(c *gin.Context) {
+	sellerID := c.MustGet("userID").(uuid.UUID)
+
+	listingID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid listing id"})
+		return
+	}
+
+	var req updateStatusRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		return
+	}
+	err = h.service.UpdateStatus(c.Request.Context(), listingID, sellerID, req.Status)
+	if err != nil {
+		if errors.Is(err, ErrInvalidStatus) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if errors.Is(err, ErrNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		if errors.Is(err, ErrNotYourListing) {
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			return
+		}
+
+		log.Println("update listing status:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": req.Status})
 }

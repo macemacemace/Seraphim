@@ -548,3 +548,14 @@ img.listing-photo {
   border-radius: 8px;
   cursor: pointer;
 }
+
+
+.sold-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--muted);
+  color: var(--on-accent);
+  font-size: 12px;
+  font-weight: 500;
+}

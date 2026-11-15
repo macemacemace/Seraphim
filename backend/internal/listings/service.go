@@ -19,9 +19,10 @@ var (
 	ErrInvalidPrice    = errors.New("price must be 0 or more")
 	ErrNotFound        = errors.New("listing not found")
 	ErrInvalidLocation = errors.New("invalid location")
-	ErrNotYourListing  = errors.New("you can only add photos to your own listings")
+	ErrNotYourListing  = errors.New("you can only change your own listing")
 	ErrTooManyPhotos   = errors.New("a listing can have at most 5 photos")
 	ErrInvalidSort     = errors.New("sort must be oldest, price_asc or price_desc")
+	ErrInvalidStatus   = errors.New("status must be ACTIVE or SOLD")
 )
 
 type listingStore interface {
@@ -32,6 +33,7 @@ type listingStore interface {
 	CreateListingPhoto(ctx context.Context, arg db.CreateListingPhotoParams) (db.ListingPhoto, error)
 	ListListingPhotos(ctx context.Context, listingID uuid.UUID) ([]db.ListingPhoto, error)
 	ListListingsBySeller(ctx context.Context, sellerID uuid.UUID) ([]db.ListListingsBySellerRow, error)
+	UpdateListingStatus(ctx context.Context, arg db.UpdateListingStatusParams) error
 }
 
 type photoUploader interface {
@@ -210,4 +212,29 @@ func (s *Service) ListingPhotos(ctx context.Context, listingID uuid.UUID) ([]db.
 	}
 
 	return photos, nil
+}
+
+func (s *Service) UpdateStatus(ctx context.Context, listingID, sellerID uuid.UUID, status string) error {
+	if status != "ACTIVE" && status != "SOLD" {
+		return ErrInvalidStatus
+	}
+
+	listing, err := s.Get(ctx, listingID)
+	if err != nil {
+		return err
+	}
+
+	if listing.SellerID != sellerID {
+		return ErrNotYourListing
+	}
+
+	err = s.store.UpdateListingStatus(ctx, db.UpdateListingStatusParams{
+		Status: status,
+		ID:     listingID,
+	})
+
+	if err != nil {
+		return fmt.Errorf("update listing status: %w", err)
+	}
+	return nil
 }

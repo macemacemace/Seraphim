@@ -165,3 +165,8 @@ SELECT id,
 FROM listings
 WHERE seller_id = @seller_id
 ORDER BY created_at DESC;
+-- name: UpdateListingStatus :exec
+UPDATE listings
+SET status = @status,
+    updated_at = now()
+WHERE id = @id;

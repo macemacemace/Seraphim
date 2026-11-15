@@ -24,6 +24,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
           </div>
         )}
         <h2>{listing.title}</h2>
+        {listing.status === "SOLD" && <span className="sold-badge">Sold</span>}
         <p className="listing-price">
           {listing.price === 0 && "Free"}
           {listing.price > 0 && `${listing.price} den`}

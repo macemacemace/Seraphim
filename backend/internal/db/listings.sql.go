@@ -448,3 +448,20 @@ func (q *Queries) ListRecentListings(ctx context.Context, arg ListRecentListings
 	}
 	return items, nil
 }
+
+const updateListingStatus = `-- name: UpdateListingStatus :exec
+UPDATE listings
+SET status = $1,
+    updated_at = now()
+WHERE id = $2
+`
+
+type UpdateListingStatusParams struct {
+	Status string
+	ID     uuid.UUID
+}
+
+func (q *Queries) UpdateListingStatus(ctx context.Context, arg UpdateListingStatusParams) error {
+	_, err := q.db.Exec(ctx, updateListingStatus, arg.Status, arg.ID)
+	return err
+}

@@ -93,6 +93,8 @@ func main() {
 	api.GET("/me/listings", auth.RequireAuth([]byte(jwtSecret)),
 		listingsHandler.Mine)
 
+	api.PATCH("/listings/:id/status", auth.RequireAuth([]byte(jwtSecret)), listingsHandler.UpdateStatus)
+
 	api.GET("/listings", listingsHandler.ListNearby)
 	api.GET("/health", func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
