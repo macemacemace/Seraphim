@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import type { Listing, User } from "../types";
-import { timeAgo } from "../timeAgo";
+import ListingCard from "../components/ListingCard";
 
 export default function FeedPage() {
   const [listings, setListings] = useState<Listing[]>([]);
@@ -240,34 +240,7 @@ export default function FeedPage() {
       )}
       <div className="feed-grid">
         {listings.map((listing) => (
-          <Link
-            key={listing.id}
-            to={`/listings/${listing.id}`}
-            className="card-link"
-          >
-            <article className="listing-card">
-              {listing.coverUrl && (
-                <img
-                  className="card-photo"
-                  src={listing.coverUrl}
-                  alt={listing.title}
-                />
-              )}
-              {!listing.coverUrl && (
-                <div className="card-photo card-placeholder">
-                  {listing.type === "ITEM" && "📦"}
-                  {listing.type === "SERVICE" && "🛠️"}
-                </div>
-              )}
-              <h2>{listing.title}</h2>
-              <p className="listing-price">
-                {listing.price === 0 && "Free"}
-                {listing.price > 0 && `${listing.price} den`}
-              </p>
-              <p className="listing-type">{listing.type}</p>
-              <p className="listing-date">{timeAgo(listing.createdAt)}</p>
-            </article>
-          </Link>
+          <ListingCard key={listing.id} listing={listing} />
         ))}
       </div>
     </main>
