@@ -578,3 +578,25 @@ img.listing-photo {
   border-radius: 8px;
   cursor: pointer;
 }
+
+.delete-button {
+  margin-top: 8px;
+  padding: 10px 24px;
+  font-size: 16px;
+  font-family: inherit;
+  background: transparent;
+  color: white;
+  border: 1px solid #C0392B;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #C0392B;
+  font-weight: 600;
+  
+}
+
+.seller-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}

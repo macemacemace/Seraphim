@@ -170,3 +170,6 @@ UPDATE listings
 SET status = @status,
     updated_at = now()
 WHERE id = @id;
+-- name: DeleteListing :exec
+DELETE FROM listings
+WHERE id = @listing_id;

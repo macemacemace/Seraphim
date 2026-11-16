@@ -93,6 +93,8 @@ func main() {
 	api.GET("/me/listings", auth.RequireAuth([]byte(jwtSecret)),
 		listingsHandler.Mine)
 
+	api.DELETE("/listings/:id", auth.RequireAuth([]byte(jwtSecret)), listingsHandler.Delete)
+
 	api.PATCH("/listings/:id/status", auth.RequireAuth([]byte(jwtSecret)), listingsHandler.UpdateStatus)
 
 	api.GET("/listings", listingsHandler.ListNearby)

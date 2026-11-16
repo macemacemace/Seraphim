@@ -93,6 +93,16 @@ func (q *Queries) CreateListing(ctx context.Context, arg CreateListingParams) (C
 	return i, err
 }
 
+const deleteListing = `-- name: DeleteListing :exec
+DELETE FROM listings
+WHERE id = $1
+`
+
+func (q *Queries) DeleteListing(ctx context.Context, listingID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteListing, listingID)
+	return err
+}
+
 const getListing = `-- name: GetListing :one
 SELECT id,
     seller_id,

@@ -424,3 +424,31 @@ func (h *Handler) UpdateStatus(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"status": req.Status})
 }
+
+func (h *Handler) Delete(c *gin.Context) {
+	sellerID := c.MustGet("userID").(uuid.UUID)
+
+	listingID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid listing id"})
+		return
+	}
+
+	err = h.service.Delete(c.Request.Context(), listingID, sellerID)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		if errors.Is(err, ErrNotYourListing) {
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			return
+		}
+
+		log.Println("delete listing:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math"
 	"strings"
 
@@ -34,10 +35,12 @@ type listingStore interface {
 	ListListingPhotos(ctx context.Context, listingID uuid.UUID) ([]db.ListingPhoto, error)
 	ListListingsBySeller(ctx context.Context, sellerID uuid.UUID) ([]db.ListListingsBySellerRow, error)
 	UpdateListingStatus(ctx context.Context, arg db.UpdateListingStatusParams) error
+	DeleteListing(ctx context.Context, id uuid.UUID) error
 }
 
 type photoUploader interface {
 	Upload(ctx context.Context, file io.Reader) (string, string, error)
+	Delete(ctx context.Context, publicID string) error
 }
 
 type Service struct {
@@ -236,5 +239,32 @@ func (s *Service) UpdateStatus(ctx context.Context, listingID, sellerID uuid.UUI
 	if err != nil {
 		return fmt.Errorf("update listing status: %w", err)
 	}
+	return nil
+}
+func (s *Service) Delete(ctx context.Context, listingID, sellerID uuid.UUID) error {
+	listing, err := s.Get(ctx, listingID)
+	if err != nil {
+		return err
+	}
+
+	if listing.SellerID != sellerID {
+		return ErrNotYourListing
+	}
+
+	photos, err := s.store.ListListingPhotos(ctx, listingID)
+	if err != nil {
+		return fmt.Errorf("list photos: %w", err)
+	}
+
+	if err := s.store.DeleteListing(ctx, listingID); err != nil {
+		return fmt.Errorf("delete listing: %w", err)
+	}
+
+	for _, p := range photos {
+		if err := s.photos.Delete(ctx, p.PublicID); err != nil {
+			log.Println("delete photo from cloudinary:", err)
+		}
+	}
+
 	return nil
 }

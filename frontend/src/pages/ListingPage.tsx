@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import type { Listing, Photo } from "../types";
 import { Link } from "react-router";
 import { useCurrentUser } from "../useCurrentUser";
@@ -11,6 +11,7 @@ export default function ListingPage() {
   const [notFound, setNotFound] = useState(false);
   const [selected, setSelected] = useState(0);
   const user = useCurrentUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`/api/listings/${id}`)
@@ -98,6 +99,27 @@ export default function ListingPage() {
     });
   }
 
+  function handleDelete() {
+    if (listing === null) {
+      return;
+    }
+
+    const sure = window.confirm("Delete this listing? This can't be undone.");
+    if (!sure) {
+      return;
+    }
+    fetch(`/api/listings/${listing.id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }).then((res) => {
+      if (res.ok) {
+        navigate("/");
+      }
+    });
+  }
+
   let statusButtonText = "Mark as sold";
   if (listing.status === "SOLD") {
     statusButtonText = "Mark as active";
@@ -175,9 +197,24 @@ export default function ListingPage() {
       <p className="listing-date">Listed on {listedDate}</p>
 
       {user && user.id === listing.sellerId && (
-        <button type="button" className="status-button" onClick={toggleStatus}>
-          {statusButtonText}
-        </button>
+        <div className="seller-actions">
+          <>
+            <button
+              type="button"
+              className="status-button"
+              onClick={toggleStatus}
+            >
+              {statusButtonText}
+            </button>
+            <button
+              type="button"
+              className="delete-button"
+              onClick={handleDelete}
+            >
+              Delete listing
+            </button>
+          </>
+        </div>
       )}
     </main>
   );

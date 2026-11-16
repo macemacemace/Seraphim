@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 )
 
@@ -29,4 +30,15 @@ func (c *Cloudinary) Upload(ctx context.Context, file io.Reader) (string, string
 		return "", "", fmt.Errorf("upload photo: %w", err)
 	}
 	return result.SecureURL, result.PublicID, nil
+}
+
+func (c *Cloudinary) Delete(ctx context.Context, publicID string) error {
+	_, err := c.cld.Upload.Destroy(ctx, uploader.DestroyParams{
+		PublicID:   publicID,
+		Invalidate: api.Bool(true),
+	})
+	if err != nil {
+		return fmt.Errorf("delete photo: %w", err)
+	}
+	return nil
 }
