@@ -151,6 +151,13 @@ export default function FeedPage() {
           <Link to="/sell" className="sell-button">
             Sell something
           </Link>
+
+          {!user && (
+            <Link to="/login" className="login-link">
+              Login
+            </Link>
+          )}
+
           {user && (
             <Link to="/me" className="avatar" aria-label="My profile">
               {user.name[0].toUpperCase()}
