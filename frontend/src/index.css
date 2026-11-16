@@ -537,17 +537,6 @@ img.listing-photo {
   color: var(--text);
 }
 
-.logout-button {
-  margin-top: 16px;
-  padding: 10px 24px;
-  font-size: 16px;
-  font-family: inherit;
-  background: transparent;
-  color: var(--accent);
-  border: 1px solid var(--accent);
-  border-radius: 8px;
-  cursor: pointer;
-}
 
 
 .sold-badge {
@@ -575,4 +564,17 @@ img.listing-photo {
   font-weight: 700;
   text-decoration: none;
 
+}
+
+.logout-button,
+.status-button {
+  margin-top: 16px;
+  padding: 10px 24px;
+  font-size: 16px;
+  font-family: inherit;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  cursor: pointer;
 }

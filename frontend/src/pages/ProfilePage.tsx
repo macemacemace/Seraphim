@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import type { Listing, User } from "../types";
 import ListingCard from "../components/ListingCard";
+import LoadingDots from "../components/LoadingDots";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
@@ -51,7 +52,7 @@ export default function ProfilePage() {
   if (user === null) {
     return (
       <main>
-        <p>Loading...</p>
+        <LoadingDots />
       </main>
     );
   }

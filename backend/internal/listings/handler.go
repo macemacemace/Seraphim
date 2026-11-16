@@ -31,6 +31,7 @@ type updateStatusRequest struct {
 type listingDetailResponse struct {
 	createListingResponse
 	Photos []photoResponse `json:"photos"`
+	Status string          `json:"status"`
 }
 type createListingRequest struct {
 	Type        string  `json:"type"`
@@ -150,6 +151,7 @@ func (h *Handler) Get(c *gin.Context) {
 			CreatedAt:   listing.CreatedAt,
 		},
 		Photos: photoList,
+		Status: listing.Status,
 	})
 
 }

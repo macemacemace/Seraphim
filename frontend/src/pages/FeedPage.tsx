@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
-import type { Listing, User } from "../types";
+import type { Listing } from "../types";
 import ListingCard from "../components/ListingCard";
+import LoadingDots from "../components/LoadingDots";
+import { useCurrentUser } from "../useCurrentUser";
 
 export default function FeedPage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [user, setUser] = useState<User | null>(null);
 
   const q = searchParams.get("q") || "";
   const type = searchParams.get("type") || "";
@@ -62,27 +63,7 @@ export default function FeedPage() {
     );
   }, [query]);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      return;
-    }
-
-    fetch("/api/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (!res.ok) {
-          return null;
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data) {
-          setUser(data);
-        }
-      });
-  }, []);
+  const user = useCurrentUser();
 
   function changeType(value: string) {
     const next = new URLSearchParams(searchParams);
@@ -225,16 +206,7 @@ export default function FeedPage() {
           Apply
         </button>
       </div>
-      {loading && (
-        <div className="feed-loading">
-          <div className="dots">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <p className="feed-message">Finding listings near you...</p>
-        </div>
-      )}
+      {loading && <LoadingDots message="Finding listings near you..." />}
 
       {!loading && listings.length === 0 && q === "" && (
         <p className="feed-message">

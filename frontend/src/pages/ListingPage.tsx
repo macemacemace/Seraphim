@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import type { Listing, Photo } from "../types";
 import { Link } from "react-router";
+import { useCurrentUser } from "../useCurrentUser";
+import LoadingDots from "../components/LoadingDots";
 
 export default function ListingPage() {
   const { id } = useParams();
   const [listing, setListing] = useState<Listing | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [selected, setSelected] = useState(0);
+  const user = useCurrentUser();
 
   useEffect(() => {
     fetch(`/api/listings/${id}`)
@@ -35,7 +38,7 @@ export default function ListingPage() {
   if (listing === null) {
     return (
       <main>
-        <p>Loading...</p>
+        <LoadingDots />
       </main>
     );
   }
@@ -70,6 +73,35 @@ export default function ListingPage() {
     month: "long",
     year: "numeric",
   });
+
+  function toggleStatus() {
+    if (listing === null) {
+      return;
+    }
+
+    let newStatus = "SOLD";
+    if (listing.status === "SOLD") {
+      newStatus = "ACTIVE";
+    }
+
+    fetch(`/api/listings/${listing.id}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ status: newStatus }),
+    }).then((res) => {
+      if (res.ok) {
+        setListing({ ...listing, status: newStatus });
+      }
+    });
+  }
+
+  let statusButtonText = "Mark as sold";
+  if (listing.status === "SOLD") {
+    statusButtonText = "Mark as active";
+  }
 
   return (
     <main className="listing-page">
@@ -131,6 +163,8 @@ export default function ListingPage() {
         </>
       )}
 
+      {listing.status === "SOLD" && <span className="sold-badge">Sold</span>}
+
       <h1>{listing.title}</h1>
       <p className="listing-price">
         {listing.price === 0 && "Free"}
@@ -139,6 +173,12 @@ export default function ListingPage() {
       <p className="listing-type">{listing.type}</p>
       <p className="listing-description">{listing.description}</p>
       <p className="listing-date">Listed on {listedDate}</p>
+
+      {user && user.id === listing.sellerId && (
+        <button type="button" className="status-button" onClick={toggleStatus}>
+          {statusButtonText}
+        </button>
+      )}
     </main>
   );
 }
