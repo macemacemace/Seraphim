@@ -10,6 +10,17 @@ import (
 	"github.com/google/uuid"
 )
 
+type Conversation struct {
+	ID               uuid.UUID
+	ListingID        uuid.UUID
+	BuyerID          uuid.UUID
+	SellerID         uuid.UUID
+	LastMessageAt    time.Time
+	BuyerLastReadAt  *time.Time
+	SellerLastReadAt *time.Time
+	CreatedAt        time.Time
+}
+
 type Listing struct {
 	ID          uuid.UUID
 	SellerID    uuid.UUID
@@ -30,6 +41,14 @@ type ListingPhoto struct {
 	PublicID  string
 	Position  int32
 	CreatedAt time.Time
+}
+
+type Message struct {
+	ID             uuid.UUID
+	ConversationID uuid.UUID
+	SenderID       uuid.UUID
+	Body           string
+	CreatedAt      time.Time
 }
 
 type User struct {
