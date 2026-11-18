@@ -12,6 +12,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/macemacemace/seraphim/backend/internal/auth"
 	"github.com/macemacemace/seraphim/backend/internal/listings"
+	"github.com/macemacemace/seraphim/backend/internal/messages"
 	"github.com/macemacemace/seraphim/backend/internal/storage"
 
 	"github.com/macemacemace/seraphim/backend/internal/db"
@@ -82,6 +83,9 @@ func main() {
 
 	listingsService := listings.NewService(queries, photos)
 
+	messagesService := messages.NewService(queries)
+	messagesHandler := messages.NewHandler(messagesService)
+
 	listingsHandler := listings.NewHandler(listingsService)
 
 	api.POST("/listings", auth.RequireAuth([]byte(jwtSecret)), listingsHandler.Create)
@@ -96,6 +100,8 @@ func main() {
 	api.DELETE("/listings/:id", auth.RequireAuth([]byte(jwtSecret)), listingsHandler.Delete)
 
 	api.PATCH("/listings/:id/status", auth.RequireAuth([]byte(jwtSecret)), listingsHandler.UpdateStatus)
+
+	api.POST("/conversations", auth.RequireAuth([]byte(jwtSecret)), messagesHandler.Start)
 
 	api.GET("/listings", listingsHandler.ListNearby)
 	api.GET("/health", func(c *gin.Context) {
